@@ -40,6 +40,7 @@ public class Monster : MonoBehaviour
     public GameObject Direction2;
     private bool isGoingAround = false;
     private float timeGoingAround = 0;
+    private GameObject chosenDirection = null;
     // Start is called before the first frame update
     void Start()
     {
@@ -54,9 +55,10 @@ public class Monster : MonoBehaviour
         if (isGoingAround)
         {
             timeGoingAround += Time.deltaTime;
-            if(timeGoingAround > 2)
+            if(timeGoingAround > 0.5f)
             {
                 isGoingAround = false;
+                chosenDirection = null;
                 timeGoingAround = 0;
             }
         }
@@ -67,7 +69,7 @@ public class Monster : MonoBehaviour
         {
             CheckPlayer();
         }
-        else if(distanceToPlayer <= chasingDistance && distanceToPlayer > 1.5)
+        else if(distanceToPlayer <= chasingDistance && distanceToPlayer > 1.25f)
         {
             FollowPlayer();
         }
@@ -173,7 +175,7 @@ public class Monster : MonoBehaviour
                     if (!isMonsterAhead && hit.collider.tag.Equals("Monster") && !hit.collider.gameObject.name.Equals(name))
                     {
                         var distance = GetDistance(hit.collider.transform.position, transform.position);
-                        if (distance < 2)
+                        if (distance < 1.25f)
                         {
                             isMonsterAhead = true;
                             monsterAheadPos = hit.transform.position;
@@ -277,20 +279,28 @@ public class Monster : MonoBehaviour
 
     private Vector2 GetDirAround(Vector2 monsterAheadPos)
     {
-        var resX1 = Direction1.transform.position.x;
-        var resX2 = Direction2.transform.position.x;
-        var resY1 = Direction1.transform.position.y;
-        var resY2 = Direction2.transform.position.y;
-
-        var lenToMonster1 = GetDistance(Direction1.transform.position, monsterAheadPos);
-        var lenToMonster2 = GetDistance(Direction2.transform.position, monsterAheadPos);
         var dir = new Vector3();
-        if(lenToMonster1 > lenToMonster2)
+        if (chosenDirection == null)
         {
-            dir = (new Vector3(resX1, resY1, transform.position.z) - transform.position) / 5;
+            var resX1 = Direction1.transform.position.x;
+            var resX2 = Direction2.transform.position.x;
+            var resY1 = Direction1.transform.position.y;
+            var resY2 = Direction2.transform.position.y;
+
+            var lenToMonster1 = GetDistance(Direction1.transform.position, monsterAheadPos);
+            var lenToMonster2 = GetDistance(Direction2.transform.position, monsterAheadPos);
+            
+            if (lenToMonster1 > lenToMonster2)
+            {
+                dir = (new Vector3(resX1, resY1, transform.position.z) - transform.position) / 5;
+                chosenDirection = Direction1;
+                return dir;
+            }
+            dir = (new Vector3(resX2, resY2, transform.position.z) - transform.position) / 5;
+            chosenDirection = Direction2;
             return dir;
         }
-        dir = (new Vector3(resX2, resY2, transform.position.z) - transform.position) / 5;
+        dir = (new Vector3(chosenDirection.transform.position.x, chosenDirection.transform.position.y, transform.position.z) - transform.position) / 5;
         return dir;
     }
 
