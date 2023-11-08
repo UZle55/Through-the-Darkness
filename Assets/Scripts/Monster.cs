@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class Monster : MonoBehaviour
 {
-    private enum direction
+    public enum Direction
     {
         up,
         down,
@@ -14,19 +14,32 @@ public class Monster : MonoBehaviour
         none
     }
 
+    public enum AttackType
+    {
+        melee,
+        distance
+    }
+
     public bool isChasing = false;
     public int moveSpeed;
     private Vector2 moveVector = new Vector2(0, 0);
     public GameObject player;
     public float chasingDistance = 3f;
     private float distanceToPlayer = 0;
-    private direction wallTouchDir;
+    private Direction wallTouchDir;
     private GameObject wall;
     private bool isTouchingWall = false;
     private Vector2 firstDir;
     private float timeToContinue = 0.25f;
     private float t = 0f;
     public GameObject info;
+    public AttackType attackType;
+
+    public GameObject Rot;
+    public GameObject Direction1;
+    public GameObject Direction2;
+    private bool isGoingAround = false;
+    private float timeGoingAround = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -37,6 +50,17 @@ public class Monster : MonoBehaviour
     void Update()
     {
         t += Time.deltaTime;
+
+        if (isGoingAround)
+        {
+            timeGoingAround += Time.deltaTime;
+            if(timeGoingAround > 2)
+            {
+                isGoingAround = false;
+                timeGoingAround = 0;
+            }
+        }
+
         distanceToPlayer = Mathf.Sqrt(Mathf.Pow((transform.position.x - player.transform.position.x), 2) + Mathf.Pow((transform.position.y - player.transform.position.y), 2));
 
         if (!isChasing)
@@ -52,7 +76,37 @@ public class Monster : MonoBehaviour
             isChasing = false;
             StopMoving();
         }
+
+        RotateRot();
         
+    }
+
+    private void RotateRot()
+    {
+        var x1 = player.transform.position.x;
+        var y1 = player.transform.position.y;
+        var x2 = transform.position.x;
+        var y2 = transform.position.y;
+        var len = Mathf.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+        var dx = x2 - x1;
+        var dy = y2 - y1;
+        var arcsin = Mathf.Asin(dx / len);
+        var angle = arcsin * 180 / Mathf.PI;
+        if(angle > 0)
+        {
+            if(dy > 0)
+            {
+                angle = 180 - angle;
+            }
+        }
+        else
+        {
+            if(dy > 0)
+            {
+                angle = -180 - angle;
+            }
+        }
+        Rot.transform.localEulerAngles = new Vector3(0, 0, angle);
     }
 
     private void StopMoving()
@@ -65,40 +119,108 @@ public class Monster : MonoBehaviour
         var c = Mathf.Sqrt(dir.x * dir.x + dir.y * dir.y);
         var coef = moveSpeed / c;
         GetComponent<Rigidbody2D>().velocity = dir * coef;
+        info.GetComponent<Text>().text = "c: " + c + "  coef: " + coef + "  vel: " + GetComponent<Rigidbody2D>().velocity.ToString();
+
     }
 
     private void CheckPlayer()
     {
         var dir = (player.transform.position - transform.position) / 5;
         //Debug.DrawRay(transform.position, dir);
-        var hit = Physics2D.Raycast(transform.position, dir, chasingDistance);
-        if (hit.collider == null)
+        var hits = Physics2D.RaycastAll(transform.position, dir, chasingDistance);
+        foreach (var hit in hits)
         {
-            GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
-        }
-        else if (hit.collider.tag.Equals("Player"))
-        {
-            isChasing = true;
+            if (hit.collider.tag.Equals("Wall"))
+            {
+                GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+                break;
+            }
+            if (hit.collider.tag.Equals("Player"))
+            {
+                isChasing = true;
+                break;
+            }
         }
     }
 
     private void FollowPlayer()
     {
-        var dir = (player.transform.position - transform.position) / 5;
-        var hit = Physics2D.Raycast(transform.position, dir, chasingDistance);
-        if (timeToContinue < t && !isTouchingWall)
+        var pos1 = transform.position - new Vector3(0.45f, 0, 0);
+        var pos2 = transform.position - new Vector3(-0.45f, 0, 0);
+        var pos3 = transform.position - new Vector3(0, 0.45f, 0);
+        var pos4 = transform.position - new Vector3(0, -0.45f, 0);
+        var dir1 = (player.transform.position - pos1) / 5;
+        var dir2 = (player.transform.position - pos2) / 5;
+        var dir3 = (player.transform.position - pos3) / 5;
+        var dir4 = (player.transform.position - pos4) / 5;
+        var arrPos = new Vector3[] { pos1, pos2, pos3, pos4 };
+        var arrDir = new Vector3[] { dir1, dir2, dir3, dir4 };
+        var isSeePlayer = true;
+        var isMonsterAhead = false;
+        var monsterAheadPos = new Vector2(0, 0);
+        if (!isGoingAround)
         {
+            for (var i = 0; i < 4; i++)
+            {
+                var hits = Physics2D.RaycastAll(arrPos[i], arrDir[i], chasingDistance);
+                foreach (var hit in hits)
+                {
+                    if (isSeePlayer && hit.collider.tag.Equals("Wall"))
+                    {
+                        isSeePlayer = false;
+                        break;
+                    }
+                    if (!isMonsterAhead && hit.collider.tag.Equals("Monster") && !hit.collider.gameObject.name.Equals(name))
+                    {
+                        var distance = GetDistance(hit.collider.transform.position, transform.position);
+                        if (distance < 2)
+                        {
+                            isMonsterAhead = true;
+                            monsterAheadPos = hit.transform.position;
+                            break;
+                        }
+                    }
+                    if (hit.collider.tag.Equals("Player"))
+                    {
+                        break;
+                    }
+                }
+            }  
+        }
+        var dir = (player.transform.position - transform.position) / 5;
+        if (isSeePlayer && !isMonsterAhead && !isGoingAround)
+        {
+            if (name.Split()[1].Equals("2"))
+            {
+                //info.GetComponent<Text>().text = "по прямой";
+            }
+            
             SetVelocity(dir);
         }
-        else
+        else if (isSeePlayer && isMonsterAhead || isGoingAround)
         {
+            if (name.Split()[1].Equals("2"))
+            {
+                //info.GetComponent<Text>().text = "в обход";
+            }
+            isGoingAround = true;
+            SetVelocity(GetDirAround(monsterAheadPos));
+        }
+        else if(!isGoingAround)
+        {
+
+            if (name.Split()[1].Equals("2"))
+            {
+                //info.GetComponent<Text>().text = "вдоль стены";
+            }
+
             SetVelocity(FindDirection());
         }
     }
 
     private Vector2 FindDirection()
     {
-        if(wallTouchDir == direction.up || wallTouchDir == direction.down)
+        if(wallTouchDir == Direction.up || wallTouchDir == Direction.down)
         {
             if(firstDir.x > 0)
             {
@@ -123,19 +245,19 @@ public class Monster : MonoBehaviour
         this.wall = wall;
         if (dir.Equals("Up"))
         {
-            wallTouchDir = direction.up;
+            wallTouchDir = Direction.up;
         }
         if (dir.Equals("Down"))
         {
-            wallTouchDir = direction.down;
+            wallTouchDir = Direction.down;
         }
         if (dir.Equals("Left"))
         {
-            wallTouchDir = direction.left;
+            wallTouchDir = Direction.left;
         }
         if (dir.Equals("Right"))
         {
-            wallTouchDir = direction.right;
+            wallTouchDir = Direction.right;
         }
 
         //info.GetComponent<Text>().text += dir;
@@ -143,13 +265,37 @@ public class Monster : MonoBehaviour
 
     public void StopTouchingWall(string dir)
     {
-        if ((dir.Equals("Up") && wallTouchDir == direction.up) || (dir.Equals("Down") && wallTouchDir == direction.down)
-            || (dir.Equals("Left") && wallTouchDir == direction.left) || (dir.Equals("Right") && wallTouchDir == direction.right))
+        if ((dir.Equals("Up") && wallTouchDir == Direction.up) || (dir.Equals("Down") && wallTouchDir == Direction.down)
+            || (dir.Equals("Left") && wallTouchDir == Direction.left) || (dir.Equals("Right") && wallTouchDir == Direction.right))
         {
             t = 0;
             isTouchingWall = false;
             wall = null;
             //info.GetComponent<Text>().text += "none";
         }
+    }
+
+    private Vector2 GetDirAround(Vector2 monsterAheadPos)
+    {
+        var resX1 = Direction1.transform.position.x;
+        var resX2 = Direction2.transform.position.x;
+        var resY1 = Direction1.transform.position.y;
+        var resY2 = Direction2.transform.position.y;
+
+        var lenToMonster1 = GetDistance(Direction1.transform.position, monsterAheadPos);
+        var lenToMonster2 = GetDistance(Direction2.transform.position, monsterAheadPos);
+        var dir = new Vector3();
+        if(lenToMonster1 > lenToMonster2)
+        {
+            dir = (new Vector3(resX1, resY1, transform.position.z) - transform.position) / 5;
+            return dir;
+        }
+        dir = (new Vector3(resX2, resY2, transform.position.z) - transform.position) / 5;
+        return dir;
+    }
+
+    public static float GetDistance(Vector3 v1, Vector3 v2)
+    {
+        return Mathf.Sqrt((v1.x - v2.x) * (v1.x - v2.x) + (v1.y - v2.y) * (v1.y - v2.y));
     }
 }
