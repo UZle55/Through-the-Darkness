@@ -1,3 +1,4 @@
+using Assets.Scripts;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,10 +10,15 @@ public class Player : MonoBehaviour
     public KeyCode moveDown;
     public KeyCode moveLeft;
     public KeyCode moveRight;
+    public KeyCode attack;
     public int nextMoveSpeed;
     private int moveSpeed;
     private float diagonalMovingCoef;
     private Vector2 moveVector = new Vector2(0, 0);
+    public GameObject Info;
+
+    public GameObject Rot;
+    public GameObject Weapon;
     // Start is called before the first frame update
     void Start()
     {
@@ -64,6 +70,48 @@ public class Player : MonoBehaviour
         }
 
         SetVelocity();
+
+        RotateRot();
+
+        if (Input.GetKeyDown(attack))
+        {
+            Weapon.GetComponent<Weapon>().Attack();
+        }
+
+        if (Input.GetKeyUp(attack))
+        {
+            var a = 0;
+        }
+    }
+
+    private void RotateRot()
+    {
+        var mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        var x1 = mousePos.x;
+        var y1 = mousePos.y;
+        var x2 = transform.position.x;
+        var y2 = transform.position.y;
+        var len = Mathf.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+        var dx = x2 - x1;
+        var dy = y2 - y1;
+        var arcsin = Mathf.Asin(dx / len);
+        var angle = arcsin * 180 / Mathf.PI;
+        if (angle > 0)
+        {
+            if (dy > 0)
+            {
+                angle = 180 - angle;
+            }
+        }
+        else
+        {
+            if (dy > 0)
+            {
+                angle = -180 - angle;
+            }
+        }
+        Rot.transform.localEulerAngles = new Vector3(0, 0, angle);
+        Weapon.GetComponent<Weapon>().SetAngle(angle);
     }
 
     private void SetVelocity()

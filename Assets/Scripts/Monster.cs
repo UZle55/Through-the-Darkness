@@ -41,6 +41,9 @@ public class Monster : MonoBehaviour
     private bool isGoingAround = false;
     private float timeGoingAround = 0;
     private GameObject chosenDirection = null;
+
+    public float HP;
+    public float Damage;
     // Start is called before the first frame update
     void Start()
     {
@@ -63,7 +66,7 @@ public class Monster : MonoBehaviour
             }
         }
 
-        distanceToPlayer = Mathf.Sqrt(Mathf.Pow((transform.position.x - player.transform.position.x), 2) + Mathf.Pow((transform.position.y - player.transform.position.y), 2));
+        distanceToPlayer = GetDistance(transform.position, player.transform.position);
 
         if (!isChasing)
         {
@@ -81,6 +84,16 @@ public class Monster : MonoBehaviour
 
         RotateRot();
         
+    }
+
+    private void Attack()
+    {
+
+    }
+
+    public void GetDamage()
+    {
+
     }
 
     private void RotateRot()
