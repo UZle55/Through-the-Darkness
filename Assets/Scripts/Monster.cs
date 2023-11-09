@@ -21,6 +21,7 @@ public class Monster : MonoBehaviour
     }
 
     public bool isChasing = false;
+    private bool isStopMoving = false;
     public int moveSpeed;
     private Vector2 moveVector = new Vector2(0, 0);
     public GameObject player;
@@ -31,7 +32,8 @@ public class Monster : MonoBehaviour
     private bool isTouchingWall = false;
     private Vector2 firstDir;
     private float timeToContinue = 0.25f;
-    private float t = 0f;
+    private float timeEndedTouchingWall = 5f;
+    private float timeCanGoAfterWall = 0.25f;
     public GameObject info;
     public AttackType attackType;
 
@@ -57,7 +59,7 @@ public class Monster : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        t += Time.deltaTime;
+        timeEndedTouchingWall += Time.deltaTime;
 
         if (isGoingAround)
         {
@@ -76,13 +78,14 @@ public class Monster : MonoBehaviour
         {
             CheckPlayer();
         }
-        else if(distanceToPlayer <= chasingDistance && distanceToPlayer > 1.25f)
+        else if(distanceToPlayer > 1.25f)
         {
             FollowPlayer();
+            isStopMoving = false;
         }
         else
         {
-            isChasing = false;
+            isStopMoving = true;
             StopMoving();
         }
 
@@ -156,7 +159,7 @@ public class Monster : MonoBehaviour
         var c = Mathf.Sqrt(dir.x * dir.x + dir.y * dir.y);
         var coef = moveSpeed / c;
         GetComponent<Rigidbody2D>().velocity = dir * coef;
-        info.GetComponent<Text>().text = "c: " + c + "  coef: " + coef + "  vel: " + GetComponent<Rigidbody2D>().velocity.ToString();
+        //info.GetComponent<Text>().text = "c: " + c + "  coef: " + coef + "  vel: " + GetComponent<Rigidbody2D>().velocity.ToString();
 
     }
 
@@ -225,30 +228,30 @@ public class Monster : MonoBehaviour
             }  
         }
         var dir = (player.transform.position - transform.position) / 5;
-        if (isSeePlayer && !isMonsterAhead && !isGoingAround)
+        if (!isTouchingWall && !isMonsterAhead && !isGoingAround && timeEndedTouchingWall > timeCanGoAfterWall)
         {
             if (name.Split()[1].Equals("2"))
             {
-                //info.GetComponent<Text>().text = "по прямой";
+                info.GetComponent<Text>().text = "по прямой";
             }
             
             SetVelocity(dir);
         }
-        else if (isSeePlayer && isMonsterAhead || isGoingAround)
+        else if ((!isTouchingWall && isMonsterAhead) || isGoingAround)
         {
             if (name.Split()[1].Equals("2"))
             {
-                //info.GetComponent<Text>().text = "в обход";
+                info.GetComponent<Text>().text = "в обход";
             }
             isGoingAround = true;
             SetVelocity(GetDirAround(monsterAheadPos));
         }
-        else if(!isGoingAround)
+        else if(!isGoingAround && (isTouchingWall || timeEndedTouchingWall < timeCanGoAfterWall))
         {
 
             if (name.Split()[1].Equals("2"))
             {
-                //info.GetComponent<Text>().text = "вдоль стены";
+                info.GetComponent<Text>().text = timeEndedTouchingWall.ToString();
             }
 
             SetVelocity(FindDirection());
@@ -277,25 +280,29 @@ public class Monster : MonoBehaviour
 
     public void TouchedWall(string dir, GameObject wall)
     {
-        firstDir = (player.transform.position - transform.position) / 5;
-        isTouchingWall = true;
-        this.wall = wall;
-        if (dir.Equals("Up"))
+        if(timeEndedTouchingWall > timeCanGoAfterWall)
         {
-            wallTouchDir = Direction.up;
+            firstDir = new Vector2(player.transform.position.x - transform.position.x, player.transform.position.y - transform.position.y);
+            isTouchingWall = true;
+            this.wall = wall;
+            if (dir.Equals("Up"))
+            {
+                wallTouchDir = Direction.up;
+            }
+            if (dir.Equals("Down"))
+            {
+                wallTouchDir = Direction.down;
+            }
+            if (dir.Equals("Left"))
+            {
+                wallTouchDir = Direction.left;
+            }
+            if (dir.Equals("Right"))
+            {
+                wallTouchDir = Direction.right;
+            }
         }
-        if (dir.Equals("Down"))
-        {
-            wallTouchDir = Direction.down;
-        }
-        if (dir.Equals("Left"))
-        {
-            wallTouchDir = Direction.left;
-        }
-        if (dir.Equals("Right"))
-        {
-            wallTouchDir = Direction.right;
-        }
+        
 
         //info.GetComponent<Text>().text += dir;
     }
@@ -305,7 +312,7 @@ public class Monster : MonoBehaviour
         if ((dir.Equals("Up") && wallTouchDir == Direction.up) || (dir.Equals("Down") && wallTouchDir == Direction.down)
             || (dir.Equals("Left") && wallTouchDir == Direction.left) || (dir.Equals("Right") && wallTouchDir == Direction.right))
         {
-            t = 0;
+            timeEndedTouchingWall = 0;
             isTouchingWall = false;
             wall = null;
             //info.GetComponent<Text>().text += "none";
