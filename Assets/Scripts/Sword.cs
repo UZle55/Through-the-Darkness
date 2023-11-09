@@ -10,7 +10,7 @@ public class Sword : Weapon
     private float attackCooldown;
     public int startAngle;
     public int endAngle;
-    public float aniDuration;
+    private float aniDuration;
     private float angle;
     private int direction = 1;
     private bool isPlayingAni = false;
@@ -24,6 +24,7 @@ public class Sword : Weapon
     // Start is called before the first frame update
     void Start()
     {
+        aniDuration = aniDownTime + aniUpTime;
         attackCooldown = 1 / attackSpeed;
         RotatingAniPoint.transform.localEulerAngles = new Vector3(0, 0, startAngle);
     }
@@ -116,5 +117,25 @@ public class Sword : Weapon
 
     }
 
-    
+    public void HitMonster(GameObject monster)
+    {
+        if (isSwordGoingDown)
+        {
+            var dir = (monster.transform.position - transform.parent.position) / 5;
+            var hits = Physics2D.RaycastAll(transform.parent.position, dir, 5);
+            foreach (var hit in hits)
+            {
+                if (hit.collider.tag.Equals("Wall"))
+                {
+                    break;
+                }
+                if (hit.collider.tag.Equals("Monster"))
+                {
+                    monster.GetComponent<Monster>().GetDamage(damage);
+                    break;
+                }
+            }
+        }
+        
+    }
 }

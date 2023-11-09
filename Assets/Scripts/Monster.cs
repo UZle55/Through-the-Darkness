@@ -43,11 +43,15 @@ public class Monster : MonoBehaviour
     private GameObject chosenDirection = null;
 
     public float HP;
+    public Slider HealthBar;
+    private float maxHP;
+    private float currHP;
     public float Damage;
     // Start is called before the first frame update
     void Start()
     {
-        
+        maxHP = HP;
+        currHP = HP;
     }
 
     // Update is called once per frame
@@ -91,9 +95,23 @@ public class Monster : MonoBehaviour
 
     }
 
-    public void GetDamage()
+    public void GetDamage(float damage)
     {
+        currHP -= damage;
+        if(currHP <= 0)
+        {
+            Die();
+        }
+        else
+        {
+            var value = currHP / maxHP;
+            HealthBar.value = value;
+        }
+    }
 
+    public void Die()
+    {
+        Destroy(gameObject);
     }
 
     private void RotateRot()
@@ -120,6 +138,10 @@ public class Monster : MonoBehaviour
             {
                 angle = -180 - angle;
             }
+        }
+        if(angle == float.NaN)
+        {
+            var a = 0;
         }
         Rot.transform.localEulerAngles = new Vector3(0, 0, angle);
     }

@@ -9,6 +9,7 @@ namespace Assets.Scripts
 {
     public class Weapon : MonoBehaviour
     {
+        public float damage;
         public virtual void Attack()
         {
 
