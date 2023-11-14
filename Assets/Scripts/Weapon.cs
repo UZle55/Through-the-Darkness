@@ -10,6 +10,7 @@ namespace Assets.Scripts
     public class Weapon : MonoBehaviour
     {
         public float damage;
+        public bool isMonsterWeapon = false;
         public virtual void Attack()
         {
 

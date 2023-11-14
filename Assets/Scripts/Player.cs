@@ -2,7 +2,7 @@ using Assets.Scripts;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -19,10 +19,17 @@ public class Player : MonoBehaviour
 
     public GameObject Rot;
     public GameObject Weapon;
+
+    public float HP;
+    //public GameObject HealthBar;
+    public GameObject HealthBar;
+    private float maxHP;
+    private float currHP;
     // Start is called before the first frame update
     void Start()
     {
-        
+        maxHP = HP;
+        currHP = HP;
     }
 
     // Update is called once per frame
@@ -82,6 +89,25 @@ public class Player : MonoBehaviour
         {
             var a = 0;
         }
+    }
+
+    public void GetDamage(float damage)
+    {
+        currHP -= damage;
+        if (currHP <= 0)
+        {
+            //Die();
+        }
+        else
+        {
+            var value = currHP / maxHP;
+            HealthBar.GetComponent<Slider>().value = value;
+        }
+    }
+
+    public void Die()
+    {
+        Destroy(gameObject);
     }
 
     private void RotateRot()

@@ -18,15 +18,21 @@ public class Sword : Weapon
     public float aniUpTime = 0.3f;
     private bool isSwordGoingDown = false;
     private bool isSwordGoingUp = false;
+    private int hittedEnemiesCount = 0;
+    private List<GameObject> touchingEnemies = new List<GameObject>();
 
     public GameObject RotatingPoint;
     public GameObject RotatingAniPoint;
+    public GameObject SwordTrigger;
     // Start is called before the first frame update
     void Start()
     {
         aniDuration = aniDownTime + aniUpTime;
         attackCooldown = 1 / attackSpeed;
         RotatingAniPoint.transform.localEulerAngles = new Vector3(0, 0, startAngle);
+
+        touchingEnemies = SwordTrigger.GetComponent<SwordTrigger>().GetList();
+        
     }
 
     // Update is called once per frame
@@ -39,6 +45,22 @@ public class Sword : Weapon
         if (isPlayingAni)
         {
             PlayAni();
+        }
+
+
+
+        if (isSwordGoingDown && touchingEnemies.Count > hittedEnemiesCount)
+        {
+            for(var i = hittedEnemiesCount; i < touchingEnemies.Count; i++)
+            {
+                HitEnemy(touchingEnemies[hittedEnemiesCount]);
+                hittedEnemiesCount++;
+            }
+        }
+        if (!isSwordGoingDown && touchingEnemies.Count != 0)
+        {
+            SwordTrigger.GetComponent<SwordTrigger>().ClearList();
+            hittedEnemiesCount = 0;
         }
     }
 
@@ -117,25 +139,31 @@ public class Sword : Weapon
 
     }
 
-    public void HitMonster(GameObject monster)
+    public void HitEnemy(GameObject enemy)
     {
         if (isSwordGoingDown)
         {
-            var dir = (monster.transform.position - transform.parent.position) / 5;
-            var hits = Physics2D.RaycastAll(transform.parent.position, dir, 5);
-            foreach (var hit in hits)
+            if (!isMonsterWeapon)
             {
-                if (hit.collider.tag.Equals("Wall"))
+                var dir = (enemy.transform.position - transform.parent.position) / 5;
+                var hits = Physics2D.RaycastAll(transform.parent.position, dir, 5);
+                foreach (var hit in hits)
                 {
-                    break;
-                }
-                if (hit.collider.tag.Equals("Monster"))
-                {
-                    monster.GetComponent<Monster>().GetDamage(damage);
-                    break;
+                    if (hit.collider.tag.Equals("Wall"))
+                    {
+                        break;
+                    }
+                    if (hit.collider.tag.Equals("Monster"))
+                    {
+                        enemy.GetComponent<Monster>().GetDamage(damage);
+                        break;
+                    }
                 }
             }
+            else if (isMonsterWeapon)
+            {
+                enemy.GetComponent<Player>().GetDamage(damage);
+            }
         }
-        
     }
 }

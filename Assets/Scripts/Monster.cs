@@ -1,3 +1,4 @@
+using Assets.Scripts;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -36,6 +37,7 @@ public class Monster : MonoBehaviour
     private float timeCanGoAfterWall = 0.25f;
     public GameObject info;
     public AttackType attackType;
+    public GameObject Weapon;
 
     public GameObject Rot;
     public GameObject Direction1;
@@ -43,22 +45,29 @@ public class Monster : MonoBehaviour
     private bool isGoingAround = false;
     private float timeGoingAround = 0;
     private GameObject chosenDirection = null;
+    private float attackDelayTime = 0;
+    private float attackTime = 0;
 
     public float HP;
     public Slider HealthBar;
     private float maxHP;
     private float currHP;
     public float Damage;
+    public float AttackSpeed;
     // Start is called before the first frame update
     void Start()
     {
         maxHP = HP;
         currHP = HP;
+        attackDelayTime = 1 / AttackSpeed;
+        Weapon.GetComponent<Weapon>().damage = Damage;
+        Weapon.GetComponent<Weapon>().isMonsterWeapon = true;
     }
 
     // Update is called once per frame
     void Update()
     {
+        attackTime += Time.deltaTime;
         timeEndedTouchingWall += Time.deltaTime;
 
         if (isGoingAround)
@@ -87,6 +96,33 @@ public class Monster : MonoBehaviour
         {
             isStopMoving = true;
             StopMoving();
+        }
+
+        if(isChasing && distanceToPlayer < 2f && attackTime > attackDelayTime)
+        {
+            var isSeePlayer = false;
+            var dir = (player.transform.position - transform.position) / 5;
+            var hits = Physics2D.RaycastAll(transform.position, dir, 20);
+            foreach (var hit in hits)
+            {
+                if (hit.collider.tag.Equals("Wall"))
+                {
+                    isSeePlayer = false;
+                    break;
+                }
+                if (hit.collider.tag.Equals("Player"))
+                {
+                    isSeePlayer = true;
+                    break;
+                }
+            }
+
+            if (isSeePlayer)
+            {
+                Weapon.GetComponent<Weapon>().Attack();
+                attackTime = 0;
+            }
+            
         }
 
         RotateRot();
@@ -147,6 +183,7 @@ public class Monster : MonoBehaviour
             var a = 0;
         }
         Rot.transform.localEulerAngles = new Vector3(0, 0, angle);
+        Weapon.GetComponent<Weapon>().SetAngle(angle);
     }
 
     private void StopMoving()
@@ -232,7 +269,7 @@ public class Monster : MonoBehaviour
         {
             if (name.Split()[1].Equals("2"))
             {
-                info.GetComponent<Text>().text = "по прямой";
+                //info.GetComponent<Text>().text = "по прямой";
             }
             
             SetVelocity(dir);
@@ -241,7 +278,7 @@ public class Monster : MonoBehaviour
         {
             if (name.Split()[1].Equals("2"))
             {
-                info.GetComponent<Text>().text = "в обход";
+                //info.GetComponent<Text>().text = "в обход";
             }
             isGoingAround = true;
             SetVelocity(GetDirAround(monsterAheadPos));
@@ -251,7 +288,7 @@ public class Monster : MonoBehaviour
 
             if (name.Split()[1].Equals("2"))
             {
-                info.GetComponent<Text>().text = timeEndedTouchingWall.ToString();
+                //info.GetComponent<Text>().text = timeEndedTouchingWall.ToString();
             }
 
             SetVelocity(FindDirection());
