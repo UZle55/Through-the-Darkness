@@ -15,10 +15,12 @@ public class Player : MonoBehaviour
     private int moveSpeed;
     private float diagonalMovingCoef;
     private Vector2 moveVector = new Vector2(0, 0);
-    public GameObject Info;
+    private bool isDead = false;
 
+    public GameObject Info;
     public GameObject Rot;
     public GameObject Weapon;
+    public GameObject InGameMenu;
 
     public float HP;
     //public GameObject HealthBar;
@@ -35,60 +37,77 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(nextMoveSpeed != moveSpeed)
+        if (!isDead)
         {
-            moveSpeed = nextMoveSpeed;
-            CalculateDiagonalMovingCoef();
-        }
+            if (nextMoveSpeed != moveSpeed)
+            {
+                moveSpeed = nextMoveSpeed;
+                CalculateDiagonalMovingCoef();
+            }
 
-        if (Input.GetKeyDown(moveUp))
-        {
-            moveVector += new Vector2(0, moveSpeed);
-        }
-        if (Input.GetKeyDown(moveDown))
-        {
-            moveVector += new Vector2(0, -moveSpeed);
-        }
-        if (Input.GetKeyDown(moveLeft))
-        {
-            moveVector += new Vector2(-moveSpeed, 0);
-        }
-        if (Input.GetKeyDown(moveRight))
-        {
-            moveVector += new Vector2(moveSpeed, 0);
-        }
+            if (Input.GetKeyDown(moveUp))
+            {
+                moveVector += new Vector2(0, moveSpeed);
+            }
+            if (Input.GetKeyDown(moveDown))
+            {
+                moveVector += new Vector2(0, -moveSpeed);
+            }
+            if (Input.GetKeyDown(moveLeft))
+            {
+                moveVector += new Vector2(-moveSpeed, 0);
+            }
+            if (Input.GetKeyDown(moveRight))
+            {
+                moveVector += new Vector2(moveSpeed, 0);
+            }
 
 
-        if (Input.GetKeyUp(moveUp))
-        {
-            moveVector += new Vector2(0, -moveSpeed);
-        }
-        if (Input.GetKeyUp(moveDown))
-        {
-            moveVector += new Vector2(0, moveSpeed);
-        }
-        if (Input.GetKeyUp(moveLeft))
-        {
-            moveVector += new Vector2(moveSpeed, 0);
-        }
-        if (Input.GetKeyUp(moveRight))
-        {
-            moveVector += new Vector2(-moveSpeed, 0);
-        }
+            if (Input.GetKeyUp(moveUp))
+            {
+                moveVector += new Vector2(0, -moveSpeed);
+            }
+            if (Input.GetKeyUp(moveDown))
+            {
+                moveVector += new Vector2(0, moveSpeed);
+            }
+            if (Input.GetKeyUp(moveLeft))
+            {
+                moveVector += new Vector2(moveSpeed, 0);
+            }
+            if (Input.GetKeyUp(moveRight))
+            {
+                moveVector += new Vector2(-moveSpeed, 0);
+            }
 
-        SetVelocity();
+            SetVelocity();
 
-        RotateRot();
+            RotateRot();
 
-        if (Input.GetKeyDown(attack))
-        {
-            Weapon.GetComponent<Weapon>().Attack();
+            if (Input.GetKeyDown(attack))
+            {
+                Weapon.GetComponent<Weapon>().Attack();
+            }
+
+            if (Input.GetKeyUp(attack))
+            {
+                var a = 0;
+            }
+
+            PassiveRegeneration();
         }
+        
+    }
 
-        if (Input.GetKeyUp(attack))
+    private void PassiveRegeneration()
+    {
+        currHP += Time.deltaTime * 2.5f;
+        if (currHP >= maxHP)
         {
-            var a = 0;
+            currHP = maxHP;
         }
+        var value = currHP / maxHP;
+        HealthBar.GetComponent<Slider>().value = value;
     }
 
     public void GetDamage(float damage)
@@ -96,7 +115,7 @@ public class Player : MonoBehaviour
         currHP -= damage;
         if (currHP <= 0)
         {
-            //Die();
+            Die();
         }
         else
         {
@@ -107,7 +126,8 @@ public class Player : MonoBehaviour
 
     public void Die()
     {
-        Destroy(gameObject);
+        isDead = true;
+        InGameMenu.GetComponent<InGameMenu>().ShowDeathScreen();
     }
 
     private void RotateRot()

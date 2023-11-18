@@ -52,15 +52,18 @@ public class Monster : MonoBehaviour
     public Slider HealthBar;
     private float maxHP;
     private float currHP;
-    public float Damage;
-    public float AttackSpeed;
+    private float Damage;
+    private float AttackSpeed;
+    public float closeStopDistance = 1.25f;
+    public float attackDistance = 2f;
     // Start is called before the first frame update
     void Start()
     {
+        AttackSpeed = Weapon.GetComponent<Weapon>().attackSpeed;
         maxHP = HP;
         currHP = HP;
         attackDelayTime = 1 / AttackSpeed;
-        Weapon.GetComponent<Weapon>().damage = Damage;
+        Damage = Weapon.GetComponent<Weapon>().damage;
         Weapon.GetComponent<Weapon>().isMonsterWeapon = true;
     }
 
@@ -87,7 +90,7 @@ public class Monster : MonoBehaviour
         {
             CheckPlayer();
         }
-        else if(distanceToPlayer > 1.25f)
+        else if(distanceToPlayer > closeStopDistance)
         {
             FollowPlayer();
             isStopMoving = false;
@@ -98,7 +101,7 @@ public class Monster : MonoBehaviour
             StopMoving();
         }
 
-        if(isChasing && distanceToPlayer < 2f && attackTime > attackDelayTime)
+        if(isChasing && distanceToPlayer < attackDistance && attackTime > attackDelayTime)
         {
             var isSeePlayer = false;
             var dir = (player.transform.position - transform.position) / 5;

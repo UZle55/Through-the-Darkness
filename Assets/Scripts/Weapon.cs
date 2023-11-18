@@ -11,6 +11,7 @@ namespace Assets.Scripts
     {
         public float damage;
         public bool isMonsterWeapon = false;
+        public float attackSpeed;
         public virtual void Attack()
         {
 
