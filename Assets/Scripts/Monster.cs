@@ -61,6 +61,10 @@ public class Monster : MonoBehaviour
 
     public bool isSeePlayer = false;
     public bool isActive = false;
+
+    private bool isKnockingBack = false;
+    private float durationKnockingBack = 0;
+    public bool canKnockingBack = true;
     // Start is called before the first frame update
     void Start()
     {
@@ -75,7 +79,7 @@ public class Monster : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isActive)
+        if (isActive && !isKnockingBack)
         {
             attackTime += Time.deltaTime;
             timeEndedTouchingWall += Time.deltaTime;
@@ -137,6 +141,15 @@ public class Monster : MonoBehaviour
 
             RotateRot();
 
+        }
+        else if (isKnockingBack && isActive)
+        {
+            durationKnockingBack += Time.deltaTime;
+            if(durationKnockingBack > 0.25f)
+            {
+                durationKnockingBack = 0;
+                isKnockingBack = false;
+            }
         }
     }
 
@@ -280,29 +293,20 @@ public class Monster : MonoBehaviour
         var dir = (player.transform.position - transform.position) / 5;
         if (!isTouchingWall && !isMonsterAhead && !isGoingAround && timeEndedTouchingWall > timeCanGoAfterWall)
         {
-            if (name.Split()[1].Equals("2"))
-            {
-                //info.GetComponent<Text>().text = "по прямой";
-            }
+            
             
             SetVelocity(dir);
         }
         else if ((!isTouchingWall && isMonsterAhead) || isGoingAround)
         {
-            if (name.Split()[1].Equals("2"))
-            {
-                //info.GetComponent<Text>().text = "в обход";
-            }
+            
             isGoingAround = true;
             SetVelocity(GetDirAround(monsterAheadPos));
         }
         else if(!isGoingAround && (isTouchingWall || timeEndedTouchingWall < timeCanGoAfterWall))
         {
 
-            if (name.Split()[1].Equals("2"))
-            {
-                //info.GetComponent<Text>().text = timeEndedTouchingWall.ToString();
-            }
+            
 
             SetVelocity(FindDirection());
         }
@@ -394,6 +398,20 @@ public class Monster : MonoBehaviour
         }
         dir = (new Vector3(chosenDirection.transform.position.x, chosenDirection.transform.position.y, transform.position.z) - transform.position) / 5;
         return dir;
+    }
+
+    public void KnockBack(float force)
+    {
+        if (canKnockingBack)
+        {
+            isKnockingBack = true;
+            var dir = (transform.position - player.transform.position);
+            var c = Mathf.Sqrt(dir.x * dir.x + dir.y * dir.y);
+            var coef = force / c;
+            GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+            GetComponent<Rigidbody2D>().AddForce(dir * coef);
+
+        }
     }
 
     public static float GetDistance(Vector3 v1, Vector3 v2)

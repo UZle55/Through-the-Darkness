@@ -380,6 +380,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.15
   aniUpTime: 0.25
+  knockBackForce: 0
   RotatingPoint: {fileID: 1418570334}
   RotatingAniPoint: {fileID: 1419469087}
   SwordTrigger: {fileID: 107620621}
@@ -602,6 +603,7 @@ MonoBehaviour:
   attackDistance: 7
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &16810223
 Rigidbody2D:
   serializedVersion: 4
@@ -1647,6 +1649,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.15
   aniUpTime: 0.25
+  knockBackForce: 0
   RotatingPoint: {fileID: 1415641834}
   RotatingAniPoint: {fileID: 95286092}
   SwordTrigger: {fileID: 2067858053}
@@ -2106,6 +2109,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.15
   aniUpTime: 0.25
+  knockBackForce: 0
   RotatingPoint: {fileID: 583805844}
   RotatingAniPoint: {fileID: 1167868765}
   SwordTrigger: {fileID: 1314426084}
@@ -2679,6 +2683,7 @@ MonoBehaviour:
   attackDistance: 7
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &75859622
 Rigidbody2D:
   serializedVersion: 4
@@ -2951,6 +2956,7 @@ MonoBehaviour:
   attackDistance: 7
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &77754289
 Rigidbody2D:
   serializedVersion: 4
@@ -3599,6 +3605,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.15
   aniUpTime: 0.25
+  knockBackForce: 0
   RotatingPoint: {fileID: 2023809905}
   RotatingAniPoint: {fileID: 462528964}
   SwordTrigger: {fileID: 796670528}
@@ -7110,6 +7117,7 @@ MonoBehaviour:
   attackDistance: 7
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &190122605
 Rigidbody2D:
   serializedVersion: 4
@@ -10445,6 +10453,7 @@ MonoBehaviour:
   attackDistance: 2
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &293456503
 Rigidbody2D:
   serializedVersion: 4
@@ -12850,6 +12859,7 @@ MonoBehaviour:
   attackDistance: 7
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &366864529
 Rigidbody2D:
   serializedVersion: 4
@@ -13315,6 +13325,7 @@ MonoBehaviour:
   attackDistance: 2
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &381093231
 Rigidbody2D:
   serializedVersion: 4
@@ -16536,6 +16547,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.15
   aniUpTime: 0.25
+  knockBackForce: 0
   RotatingPoint: {fileID: 782177808}
   RotatingAniPoint: {fileID: 633145058}
   SwordTrigger: {fileID: 1449976376}
@@ -20586,6 +20598,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.15
   aniUpTime: 0.25
+  knockBackForce: 0
   RotatingPoint: {fileID: 1111515606}
   RotatingAniPoint: {fileID: 1754718852}
   SwordTrigger: {fileID: 1986696028}
@@ -22436,6 +22449,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.15
   aniUpTime: 0.25
+  knockBackForce: 0
   RotatingPoint: {fileID: 674604898}
   RotatingAniPoint: {fileID: 1061336778}
   SwordTrigger: {fileID: 1926450123}
@@ -24020,6 +24034,7 @@ MonoBehaviour:
   attackDistance: 7
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &723310982
 Rigidbody2D:
   serializedVersion: 4
@@ -24472,6 +24487,7 @@ MonoBehaviour:
   attackDistance: 2
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &727604958
 Rigidbody2D:
   serializedVersion: 4
@@ -24805,6 +24821,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.1
   aniUpTime: 0.15
+  knockBackForce: 0
   RotatingPoint: {fileID: 1904963138}
   RotatingAniPoint: {fileID: 1889907400}
   SwordTrigger: {fileID: 1790577428}
@@ -25422,6 +25439,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.15
   aniUpTime: 0.25
+  knockBackForce: 0
   RotatingPoint: {fileID: 2013315775}
   RotatingAniPoint: {fileID: 657417082}
   SwordTrigger: {fileID: 70396193}
@@ -46180,7 +46198,7 @@ Transform:
   m_GameObject: {fileID: 770043723}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -24, y: 0.5, z: -1}
+  m_LocalPosition: {x: 43.08, y: -4.76, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -46227,7 +46245,7 @@ MonoBehaviour:
   FlaskManaProgressBar: {fileID: 652711296}
   FlaskHPButtonIcon: {fileID: 906881545}
   FlaskManaButtonIcon: {fileID: 1940246239}
-  HP: 50
+  HP: 5000
   HealthBar: {fileID: 1402264480}
   HealthBarText: {fileID: 1273764913}
   Mana: 50
@@ -47156,6 +47174,7 @@ MonoBehaviour:
   attackDistance: 2
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &782003862
 Rigidbody2D:
   serializedVersion: 4
@@ -47680,6 +47699,7 @@ MonoBehaviour:
   attackDistance: 7
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &793277018
 Rigidbody2D:
   serializedVersion: 4
@@ -50472,6 +50492,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.15
   aniUpTime: 0.25
+  knockBackForce: 0
   RotatingPoint: {fileID: 282646995}
   RotatingAniPoint: {fileID: 1985458489}
   SwordTrigger: {fileID: 499371053}
@@ -54065,6 +54086,7 @@ MonoBehaviour:
   attackDistance: 2
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &969346499
 Rigidbody2D:
   serializedVersion: 4
@@ -54383,6 +54405,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.15
   aniUpTime: 0.25
+  knockBackForce: 0
   RotatingPoint: {fileID: 1169538244}
   RotatingAniPoint: {fileID: 1114119946}
   SwordTrigger: {fileID: 1778847304}
@@ -54838,6 +54861,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.15
   aniUpTime: 0.25
+  knockBackForce: 0
   RotatingPoint: {fileID: 697348480}
   RotatingAniPoint: {fileID: 1586056129}
   SwordTrigger: {fileID: 1293353933}
@@ -55427,6 +55451,7 @@ MonoBehaviour:
   attackDistance: 7
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &1023547726
 Rigidbody2D:
   serializedVersion: 4
@@ -56273,6 +56298,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.35
   aniUpTime: 0.7
+  knockBackForce: 0
   RotatingPoint: {fileID: 322648877}
   RotatingAniPoint: {fileID: 139936143}
   SwordTrigger: {fileID: 1153587745}
@@ -56802,6 +56828,7 @@ MonoBehaviour:
   attackDistance: 2
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!1 &1051418666
 GameObject:
   m_ObjectHideFlags: 0
@@ -56883,6 +56910,7 @@ MonoBehaviour:
   attackDistance: 2
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &1051424534
 Rigidbody2D:
   serializedVersion: 4
@@ -57324,6 +57352,7 @@ MonoBehaviour:
   attackDistance: 7
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &1062882050
 Rigidbody2D:
   serializedVersion: 4
@@ -58930,6 +58959,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.15
   aniUpTime: 0.25
+  knockBackForce: 0
   RotatingPoint: {fileID: 1642956967}
   RotatingAniPoint: {fileID: 689661741}
   SwordTrigger: {fileID: 1545737450}
@@ -59132,6 +59162,7 @@ MonoBehaviour:
   attackDistance: 2
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &1101033564
 Rigidbody2D:
   serializedVersion: 4
@@ -63223,6 +63254,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.15
   aniUpTime: 0.25
+  knockBackForce: 0
   RotatingPoint: {fileID: 805123382}
   RotatingAniPoint: {fileID: 305407990}
   SwordTrigger: {fileID: 290109001}
@@ -63425,6 +63457,7 @@ MonoBehaviour:
   attackDistance: 7
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &1218159161
 Rigidbody2D:
   serializedVersion: 4
@@ -64229,6 +64262,7 @@ MonoBehaviour:
   attackDistance: 2
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &1264531205
 Rigidbody2D:
   serializedVersion: 4
@@ -67827,6 +67861,7 @@ MonoBehaviour:
   attackDistance: 7
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &1366174536
 Rigidbody2D:
   serializedVersion: 4
@@ -70478,6 +70513,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.15
   aniUpTime: 0.25
+  knockBackForce: 0
   RotatingPoint: {fileID: 1333650233}
   RotatingAniPoint: {fileID: 959280356}
   SwordTrigger: {fileID: 1561576943}
@@ -73408,6 +73444,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.15
   aniUpTime: 0.25
+  knockBackForce: 0
   RotatingPoint: {fileID: 1106407433}
   RotatingAniPoint: {fileID: 479050540}
   SwordTrigger: {fileID: 912269146}
@@ -77468,6 +77505,7 @@ MonoBehaviour:
   attackDistance: 2
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &1608070267
 Rigidbody2D:
   serializedVersion: 4
@@ -78407,6 +78445,7 @@ MonoBehaviour:
   attackDistance: 2
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &1631969153
 Rigidbody2D:
   serializedVersion: 4
@@ -79363,6 +79402,7 @@ MonoBehaviour:
   attackDistance: 7
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &1654282937
 Rigidbody2D:
   serializedVersion: 4
@@ -80376,6 +80416,7 @@ MonoBehaviour:
   attackDistance: 2
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &1686559187
 Rigidbody2D:
   serializedVersion: 4
@@ -82706,6 +82747,7 @@ MonoBehaviour:
   attackDistance: 2
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &1748433438
 Rigidbody2D:
   serializedVersion: 4
@@ -84271,6 +84313,7 @@ MonoBehaviour:
   attackDistance: 2
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &1791724595
 Rigidbody2D:
   serializedVersion: 4
@@ -85877,6 +85920,7 @@ MonoBehaviour:
   attackDistance: 7
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &1829125991
 Rigidbody2D:
   serializedVersion: 4
@@ -86403,6 +86447,7 @@ MonoBehaviour:
   attackDistance: 7
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &1838029525
 Rigidbody2D:
   serializedVersion: 4
@@ -88597,6 +88642,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.15
   aniUpTime: 0.25
+  knockBackForce: 0
   RotatingPoint: {fileID: 38930225}
   RotatingAniPoint: {fileID: 513016018}
   SwordTrigger: {fileID: 117905203}
@@ -89102,6 +89148,7 @@ MonoBehaviour:
   attackDistance: 4
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 0
 --- !u!50 &1910342277
 Rigidbody2D:
   serializedVersion: 4
@@ -89114,7 +89161,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 0.5
+  m_Mass: 100
   m_LinearDrag: 0
   m_AngularDrag: 0
   m_GravityScale: 0
@@ -89614,6 +89661,7 @@ MonoBehaviour:
   endAngle: -170
   aniDownTime: 0.15
   aniUpTime: 0.25
+  knockBackForce: 100
   RotatingPoint: {fileID: 365565381}
   RotatingAniPoint: {fileID: 9495926}
   SwordTrigger: {fileID: 119290813}
@@ -92586,6 +92634,7 @@ MonoBehaviour:
   attackDistance: 2
   isSeePlayer: 0
   isActive: 0
+  canKnockingBack: 1
 --- !u!50 &2005138970
 Rigidbody2D:
   serializedVersion: 4

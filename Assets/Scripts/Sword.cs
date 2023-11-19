@@ -20,6 +20,7 @@ public class Sword : Weapon
     private bool isSwordGoingUp = false;
     private int hittedEnemiesCount = 0;
     private List<GameObject> touchingEnemies = new List<GameObject>();
+    public float knockBackForce = 0;
 
     public GameObject RotatingPoint;
     public GameObject RotatingAniPoint;
@@ -160,6 +161,11 @@ public class Sword : Weapon
                     if (hit.collider.tag.Equals("Monster"))
                     {
                         enemy.GetComponent<Monster>().GetDamage(damage);
+                        if(knockBackForce != 0)
+                        {
+                            enemy.GetComponent<Monster>().KnockBack(knockBackForce);
+                        }
+                        
                         break;
                     }
                 }
