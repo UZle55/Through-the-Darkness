@@ -47,6 +47,10 @@ public class Sword : Weapon
             PlayAni();
         }
 
+        if (!isMonsterWeapon)
+        {
+            position = SwordTrigger.transform.position;
+        }
 
 
         if (isSwordGoingDown && touchingEnemies.Count > hittedEnemiesCount)
@@ -64,17 +68,15 @@ public class Sword : Weapon
         }
     }
 
-    public override void Attack()
+    public override bool Attack()
     {
         if(t > attackCooldown)
         {
             t = 0;
             PlayAni();
+            return true;
         }
-        else
-        {
-
-        }
+        return false;
     }
 
     public override void SetAngle(float angle)
@@ -113,7 +115,7 @@ public class Sword : Weapon
         if(!isSwordGoingDown && t < aniDownTime)
         {
             isSwordGoingDown = true;
-            SwordTrigger.tag = "ProjectileDestroyer";
+            SwordTrigger.tag = "Sword";
         }
         if (isSwordGoingDown)
         {

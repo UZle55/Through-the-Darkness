@@ -21,6 +21,8 @@ public class Monster : MonoBehaviour
         distance
     }
 
+    public float expRewardOnKill;
+    public float flaskChargesRewardOnKill = 3;
     public bool isChasing = false;
     private bool isStopMoving = false;
     public int moveSpeed;
@@ -56,6 +58,9 @@ public class Monster : MonoBehaviour
     private float AttackSpeed;
     public float closeStopDistance = 1.25f;
     public float attackDistance = 2f;
+
+    public bool isSeePlayer = false;
+    public bool isActive = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -70,66 +75,69 @@ public class Monster : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        attackTime += Time.deltaTime;
-        timeEndedTouchingWall += Time.deltaTime;
-
-        if (isGoingAround)
+        if (isActive)
         {
-            timeGoingAround += Time.deltaTime;
-            if(timeGoingAround > 0.5f)
+            attackTime += Time.deltaTime;
+            timeEndedTouchingWall += Time.deltaTime;
+
+            if (isGoingAround)
             {
-                isGoingAround = false;
-                chosenDirection = null;
-                timeGoingAround = 0;
-            }
-        }
-
-        distanceToPlayer = GetDistance(transform.position, player.transform.position);
-
-        if (!isChasing)
-        {
-            CheckPlayer();
-        }
-        else if(distanceToPlayer > closeStopDistance)
-        {
-            FollowPlayer();
-            isStopMoving = false;
-        }
-        else
-        {
-            isStopMoving = true;
-            StopMoving();
-        }
-
-        if(isChasing && distanceToPlayer < attackDistance && attackTime > attackDelayTime)
-        {
-            var isSeePlayer = false;
-            var dir = (player.transform.position - transform.position) / 5;
-            var hits = Physics2D.RaycastAll(transform.position, dir, 20);
-            foreach (var hit in hits)
-            {
-                if (hit.collider.tag.Equals("Wall"))
+                timeGoingAround += Time.deltaTime;
+                if (timeGoingAround > 0.5f)
                 {
-                    isSeePlayer = false;
-                    break;
-                }
-                if (hit.collider.tag.Equals("Player"))
-                {
-                    isSeePlayer = true;
-                    break;
+                    isGoingAround = false;
+                    chosenDirection = null;
+                    timeGoingAround = 0;
                 }
             }
 
-            if (isSeePlayer)
-            {
-                Weapon.GetComponent<Weapon>().Attack();
-                attackTime = 0;
-            }
-            
-        }
+            distanceToPlayer = GetDistance(transform.position, player.transform.position);
 
-        RotateRot();
-        
+            if (!isChasing)
+            {
+                CheckPlayer();
+            }
+            else if (distanceToPlayer > closeStopDistance || !isSeePlayer)
+            {
+                FollowPlayer();
+                isStopMoving = false;
+            }
+            else
+            {
+                isStopMoving = true;
+                StopMoving();
+            }
+
+            if (isChasing && distanceToPlayer < attackDistance && attackTime > attackDelayTime)
+            {
+                isSeePlayer = false;
+                var dir = (player.transform.position - transform.position) / 5;
+                var hits = Physics2D.RaycastAll(transform.position, dir, 20);
+                foreach (var hit in hits)
+                {
+                    if (hit.collider.tag.Equals("Wall"))
+                    {
+                        isSeePlayer = false;
+                        break;
+                    }
+                    if (hit.collider.tag.Equals("Player"))
+                    {
+                        isSeePlayer = true;
+                        break;
+                    }
+                }
+
+                if (isSeePlayer)
+                {
+                    Weapon.GetComponent<Weapon>().Attack();
+                    attackTime = 0;
+                }
+
+            }
+
+            RotateRot();
+
+        }
     }
 
     private void Attack()
@@ -154,6 +162,8 @@ public class Monster : MonoBehaviour
     public void Die()
     {
         Destroy(gameObject);
+        player.GetComponent<Player>().GetExp(expRewardOnKill);
+        player.GetComponent<Player>().AddCharges(flaskChargesRewardOnKill);
     }
 
     private void RotateRot()
@@ -235,7 +245,7 @@ public class Monster : MonoBehaviour
         var dir4 = (player.transform.position - pos4) / 5;
         var arrPos = new Vector3[] { pos1, pos2, pos3, pos4 };
         var arrDir = new Vector3[] { dir1, dir2, dir3, dir4 };
-        var isSeePlayer = true;
+        isSeePlayer = true;
         var isMonsterAhead = false;
         var monsterAheadPos = new Vector2(0, 0);
         if (!isGoingAround)

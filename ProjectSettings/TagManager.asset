@@ -8,6 +8,13 @@ TagManager:
   - Monster
   - OutsideWall
   - ProjectileDestroyer
+  - Sword
+  - Weapon
+  - WeaponInHands
+  - WeaponOnGround
+  - Flask
+  - FlaskOnGround
+  - FlaskInHands
   layers:
   - Default
   - TransparentFX

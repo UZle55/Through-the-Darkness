@@ -12,9 +12,11 @@ namespace Assets.Scripts
         public float damage;
         public bool isMonsterWeapon = false;
         public float attackSpeed;
-        public virtual void Attack()
+        public int attackManaCost;
+        public Vector2 position;
+        public virtual bool Attack()
         {
-
+            return false;
         }
 
         public virtual void SetAngle(float angle)

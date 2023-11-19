@@ -64,7 +64,12 @@ public class MagicSphere : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
-        else if (collision.tag.Equals("ProjectileDestroyer") && isMonsterSphere != collision.gameObject.GetComponent<Weapon>().isMonsterWeapon)
+        else if (collision.tag.Equals("Sword") && collision.gameObject != null 
+            && isMonsterSphere != collision.transform.parent.parent.parent.gameObject.GetComponent<Weapon>().isMonsterWeapon)
+        {
+            Destroy(this.gameObject);
+        }
+        else if (collision.tag.Equals("ProjectileDestroyer"))
         {
             Destroy(this.gameObject);
         }

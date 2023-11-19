@@ -19,6 +19,7 @@ public class Staff : Weapon
     private bool isStaffGoingUp = false;
     public float magicSphereVelocity = 1;
     public float maxDistance = 1;
+    public GameObject staffSprite;
     //private List<GameObject> touchingEnemies = new List<GameObject>();
 
     public GameObject RotatingPoint;
@@ -48,19 +49,23 @@ public class Staff : Weapon
             PlayAni();
         }
 
+        if (!isMonsterWeapon)
+        {
+            position = staffSprite.transform.position;
+        }
+        
+
     }
 
-    public override void Attack()
+    public override bool Attack()
     {
         if (t > attackCooldown)
         {
             t = 0;
             PlayAni();
+            return true;
         }
-        else
-        {
-
-        }
+        return false;
     }
 
     public override void SetAngle(float angle)

@@ -11,6 +11,11 @@ public class Player : MonoBehaviour
     public KeyCode moveLeft;
     public KeyCode moveRight;
     public KeyCode attack;
+    public KeyCode switchWeapon;
+    public KeyCode dropWeapon;
+    public KeyCode Interact;
+    public KeyCode useHPFlask;
+    public KeyCode useManaFlask;
     public int nextMoveSpeed;
     private int moveSpeed;
     private float diagonalMovingCoef;
@@ -19,19 +24,72 @@ public class Player : MonoBehaviour
 
     public GameObject Info;
     public GameObject Rot;
-    public GameObject Weapon;
+    public GameObject Weapon1;
+    public GameObject Weapon2;
+    private GameObject WeaponInHands;
     public GameObject InGameMenu;
+    public GameObject AbovePlayerText;
+    public GameObject FlaskHPImage;
+    public GameObject FlaskManaImage;
+    public GameObject FlaskHP;
+    public GameObject FlaskMana;
+    public GameObject FlaskHPProgressBar;
+    public GameObject FlaskManaProgressBar;
+    public GameObject FlaskHPButtonIcon;
+    public GameObject FlaskManaButtonIcon;
 
     public float HP;
-    //public GameObject HealthBar;
     public GameObject HealthBar;
+    public GameObject HealthBarText;
     private float maxHP;
     private float currHP;
+
+    public float Mana;
+    public GameObject ManaBar;
+    public GameObject ManaBarText;
+    private float maxMana;
+    private float currMana;
+
+    public float Exp;
+    public int Lvl;
+    public GameObject ExpBar;
+    public GameObject ExpBarText;
+    private float maxExp;
+    private float currExp;
+
+    public bool isClearingRoom = false;
+    private GameObject weaponToPickUp;
+    private GameObject flaskToPickUp;
+    public float maxDistanceToPickUp;
+    private GameObject chestToOpen;
     // Start is called before the first frame update
     void Start()
     {
+        FlaskHPProgressBar.SetActive(false);
+        FlaskManaProgressBar.SetActive(false);
+        if(FlaskHP == null)
+        {
+            FlaskHPButtonIcon.SetActive(false);
+        }
+        if (FlaskMana == null)
+        {
+            FlaskManaButtonIcon.SetActive(false);
+        }
+        
+        AbovePlayerText.GetComponent<Text>().text = "";
+        WeaponInHands = Weapon1;
         maxHP = HP;
         currHP = HP;
+
+        maxMana = Mana;
+        currMana = Mana;
+
+        maxExp = GetNextMaxExp();
+        currExp = Exp;
+        UpdateStatsText();
+        HealHealth(0);
+        ChangeMana(0);
+        GetExp(0);
     }
 
     // Update is called once per frame
@@ -86,7 +144,15 @@ public class Player : MonoBehaviour
 
             if (Input.GetKeyDown(attack))
             {
-                Weapon.GetComponent<Weapon>().Attack();
+                if(currMana >= WeaponInHands.GetComponent<Weapon>().attackManaCost)
+                {
+                    var isAttacked = WeaponInHands.GetComponent<Weapon>().Attack();
+                    if (isAttacked)
+                    {
+                        ChangeMana(-WeaponInHands.GetComponent<Weapon>().attackManaCost);
+                    }
+                }
+                
             }
 
             if (Input.GetKeyUp(attack))
@@ -94,20 +160,351 @@ public class Player : MonoBehaviour
                 var a = 0;
             }
 
-            PassiveRegeneration();
+            if (Input.GetKeyDown(switchWeapon))
+            {
+                SwitchWeaponInHands();
+            }
+
+            if (Input.GetKeyDown(dropWeapon) && !isClearingRoom)
+            {
+                DropWeaponInHands();
+            }
+
+            if (Input.GetKeyDown(Interact) && !isClearingRoom)
+            {
+                if(chestToOpen != null)
+                {
+                    chestToOpen.GetComponent<Chest>().Open();
+                }
+                else if(weaponToPickUp != null)
+                {
+                    PickUpWeapon(weaponToPickUp);
+                }
+                else if(flaskToPickUp != null)
+                {
+                    PickUpFlask(flaskToPickUp);
+                }
+            }
+
+            if (Input.GetKeyDown(useHPFlask) && FlaskHP != null)
+            {
+                var isUsed = FlaskHP.GetComponent<Flask>().Use();
+            }
+            if (Input.GetKeyDown(useManaFlask) && FlaskMana != null)
+            {
+                var isUsed = FlaskMana.GetComponent<Flask>().Use();
+            }
+
+            //PassiveHPRegeneration();
+
+            PassiveManaRegeneration();
+
+            CheckWeaponsAndFlasksOnGround();
+            //UpdateStatsText();
         }
         
     }
 
-    private void PassiveRegeneration()
+    public void SetChestToOpen(GameObject chest)
     {
-        currHP += Time.deltaTime * 2.5f;
-        if (currHP >= maxHP)
+        chestToOpen = chest;
+        ShowTextAbovePlayer("Сундук", -1);
+    }
+
+    public void DeleteChestToOpen()
+    {
+        if (AbovePlayerText.GetComponent<Text>().text.Equals("Сундук"))
         {
-            currHP = maxHP;
+            StopShowingTextAbovePlayer();
         }
-        var value = currHP / maxHP;
-        HealthBar.GetComponent<Slider>().value = value;
+        chestToOpen = null;
+        
+    }
+
+    private void CheckWeaponsAndFlasksOnGround()
+    {
+        if(chestToOpen == null)
+        {
+            var allWeapons = GameObject.FindGameObjectsWithTag("WeaponOnGround");
+            var distanceToWeapon = -1.0f;
+            if (allWeapons.Length != 0)
+            {
+                var minDistance = float.MaxValue;
+                var minDistanceWeaponIndex = -1;
+                for (var i = 0; i < allWeapons.Length; i++)
+                {
+                    var dis = Monster.GetDistance(allWeapons[i].GetComponent<Weapon>().position, transform.position);
+                    if (dis < minDistance)
+                    {
+                        minDistance = dis;
+                        minDistanceWeaponIndex = i;
+                    }
+                }
+                if (minDistance <= maxDistanceToPickUp)
+                {
+                    distanceToWeapon = minDistance;
+                    weaponToPickUp = allWeapons[minDistanceWeaponIndex];
+                }
+                else
+                {
+                    weaponToPickUp = null;
+                }
+            }
+
+            var allFlasks = GameObject.FindGameObjectsWithTag("FlaskOnGround");
+            var distanceToFlask = -1.0f;
+            if (allFlasks.Length != 0)
+            {
+                var minDistance = float.MaxValue;
+                var minDistanceWeaponIndex = -1;
+                for (var i = 0; i < allFlasks.Length; i++)
+                {
+                    var dis = Monster.GetDistance(allFlasks[i].transform.position, transform.position);
+                    if (dis < minDistance)
+                    {
+                        minDistance = dis;
+                        minDistanceWeaponIndex = i;
+                    }
+                }
+                if (minDistance <= maxDistanceToPickUp)
+                {
+                    distanceToFlask = minDistance;
+                    flaskToPickUp = allFlasks[minDistanceWeaponIndex];
+                }
+                else
+                {
+                    flaskToPickUp = null;
+                }
+            }
+
+
+            if(weaponToPickUp != null && flaskToPickUp != null)
+            {
+                if(distanceToWeapon < distanceToFlask)
+                {
+                    flaskToPickUp = null;
+                    ShowTextAbovePlayer(weaponToPickUp.name, -1);
+                }
+                else if(distanceToWeapon >= distanceToFlask)
+                {
+                    weaponToPickUp = null;
+                    ShowTextAbovePlayer(flaskToPickUp.name, -1);
+                }
+            }
+            else if (weaponToPickUp != null && flaskToPickUp == null)
+            {
+                ShowTextAbovePlayer(weaponToPickUp.name, -1);
+            }
+            else if (weaponToPickUp == null && flaskToPickUp != null)
+            {
+                ShowTextAbovePlayer(flaskToPickUp.name, -1);
+            }
+            else
+            {
+                StopShowingTextAbovePlayer();
+            }
+        }
+    }
+
+    private void ShowTextAbovePlayer(string text, float seconds)
+    {
+        AbovePlayerText.GetComponent<Text>().text = text;
+        if(seconds != -1)
+        {
+            Invoke("StopShowingTextAbovePlayer", seconds);
+        }
+    }
+
+    private void StopShowingTextAbovePlayer()
+    {
+        AbovePlayerText.GetComponent<Text>().text = "";
+    }
+
+    private void PickUpWeapon(GameObject weapon)
+    {
+        if(Weapon1 == null)
+        {
+            weapon.transform.parent = gameObject.transform;
+            Weapon1 = weapon;
+            WeaponInHands = Weapon1;
+            WeaponInHands.transform.localPosition = new Vector3(0, 0, -1);
+            WeaponInHands.tag = "WeaponInHands";
+            WeaponInHands.SetActive(true);
+            if(Weapon2 != null)
+            {
+                Weapon2.SetActive(false);
+            }
+        }
+        else if(Weapon2 == null)
+        {
+            weapon.transform.parent = gameObject.transform;
+            Weapon2 = weapon;
+            WeaponInHands = Weapon2;
+            WeaponInHands.transform.localPosition = new Vector3(0, 0, -1);
+            WeaponInHands.tag = "WeaponInHands";
+            WeaponInHands.SetActive(true);
+            if (Weapon1 != null)
+            {
+                Weapon1.SetActive(false);
+            }
+        }
+        else
+        {
+            weapon.transform.parent = gameObject.transform;
+            DropWeaponInHands();
+
+            if (Weapon1 == null)
+            {
+                weapon.transform.parent = gameObject.transform;
+                Weapon1 = weapon;
+                WeaponInHands = Weapon1;
+                WeaponInHands.transform.localPosition = new Vector3(0, 0, -1);
+                WeaponInHands.tag = "WeaponInHands";
+                WeaponInHands.SetActive(true);
+                if (Weapon2 != null)
+                {
+                    Weapon2.SetActive(false);
+                }
+            }
+            else if (Weapon2 == null)
+            {
+                weapon.transform.parent = gameObject.transform;
+                Weapon2 = weapon;
+                WeaponInHands = Weapon2;
+                WeaponInHands.transform.localPosition = new Vector3(0, 0, -1);
+                WeaponInHands.tag = "WeaponInHands";
+                WeaponInHands.SetActive(true);
+                if (Weapon1 != null)
+                {
+                    Weapon1.SetActive(false);
+                }
+            }
+        }
+        weaponToPickUp = null;
+    }
+
+    private void PickUpFlask(GameObject flask)
+    {
+        if (flask.GetComponent<Flask>().flaskType.Equals("HP"))
+        {
+            var currCharges = -1.0f;
+            if(FlaskHP != null)
+            {
+                currCharges = FlaskHP.GetComponent<Flask>().currentValue;
+                FlaskHP.transform.parent = null;
+                FlaskHP.transform.position = new Vector3(FlaskHP.transform.position.x, FlaskHP.transform.position.y, -0.5f);
+                FlaskHP.tag = "FlaskOnGround";
+                FlaskHP.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
+                FlaskHP.GetComponent<Flask>().StopUsing();
+            }
+            FlaskHP = flask;
+            FlaskHP.transform.parent = transform;
+            FlaskHP.GetComponent<Flask>().IconOnScreen = FlaskHPImage;
+            FlaskHP.GetComponent<Flask>().usageProgressBar = FlaskHPProgressBar;
+            FlaskHP.tag = "FlaskInHands";
+            FlaskHP.transform.localPosition = new Vector3(0, 0, 0);
+            FlaskHP.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
+            FlaskHP.GetComponent<Flask>().currentValue = currCharges;
+            if (currCharges == -1.0f)
+            {
+                FlaskHP.GetComponent<Flask>().AddCharges(999);
+            }
+            FlaskHPImage.GetComponent<Image>().color = new Color(1, 1, 1, 1);
+            flaskToPickUp = null;
+            FlaskHPButtonIcon.SetActive(true);
+
+        }
+        else if (flask.GetComponent<Flask>().flaskType.Equals("Mana"))
+        {
+            var currCharges = -1.0f;
+            if (FlaskMana != null)
+            {
+                currCharges = FlaskMana.GetComponent<Flask>().currentValue;
+                FlaskMana.transform.parent = null;
+                FlaskMana.transform.position = new Vector3(FlaskMana.transform.position.x, FlaskMana.transform.position.y, -0.5f);
+                FlaskMana.tag = "FlaskOnGround";
+                FlaskMana.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 1);
+                FlaskMana.GetComponent<Flask>().StopUsing();
+            }
+            FlaskMana = flask;
+            FlaskMana.transform.parent = transform;
+            FlaskMana.GetComponent<Flask>().IconOnScreen = FlaskManaImage;
+            FlaskMana.GetComponent<Flask>().usageProgressBar = FlaskManaProgressBar;
+            FlaskMana.tag = "FlaskInHands";
+            FlaskMana.transform.localPosition = new Vector3(0, 0, 0);
+            FlaskMana.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0);
+            FlaskMana.GetComponent<Flask>().currentValue = currCharges;
+            if (currCharges == -1.0f)
+            {
+                FlaskMana.GetComponent<Flask>().AddCharges(999);
+            }
+            FlaskManaImage.GetComponent<Image>().color = new Color(1, 1, 1, 1);
+            flaskToPickUp = null;
+            FlaskManaButtonIcon.SetActive(true);
+        }
+    }
+
+    private void SwitchWeaponInHands()
+    {
+        if (Weapon1 != null && Weapon2 != null)
+        {
+            if (WeaponInHands.Equals(Weapon1))
+            {
+                Weapon1.SetActive(false);
+                WeaponInHands = Weapon2;
+                Weapon2.SetActive(true);
+            }
+            else if (WeaponInHands.Equals(Weapon2))
+            {
+                Weapon2.SetActive(false);
+                WeaponInHands = Weapon1;
+                Weapon1.SetActive(true);
+            }
+        }
+        
+    }
+
+    private void DropWeaponInHands()
+    {
+        if(Weapon1 != null && Weapon2 != null)
+        {
+            if (WeaponInHands.name.Equals(Weapon1.name))
+            {
+                Weapon1.transform.parent = null;
+                Weapon1.transform.position = new Vector3(Weapon1.transform.position.x, Weapon1.transform.position.y, -0.5f);
+                Weapon1.tag = "WeaponOnGround";
+                Weapon1 = null;
+                WeaponInHands = Weapon2;
+                Weapon2.SetActive(true);
+            }
+            else if (WeaponInHands.name.Equals(Weapon2.name))
+            {
+                Weapon2.transform.parent = null;
+                Weapon2.transform.position = new Vector3(Weapon2.transform.position.x, Weapon2.transform.position.y, -0.5f);
+                Weapon2.tag = "WeaponOnGround";
+                Weapon2 = null;
+                WeaponInHands = Weapon1;
+                Weapon1.SetActive(true);
+            }
+        }
+        
+    }
+
+    private void UpdateStatsText()
+    {
+        HealthBarText.GetComponent<Text>().text = (int)currHP + "/" + (int)maxHP;
+        ManaBarText.GetComponent<Text>().text = (int)currMana + "/" + (int)maxMana;
+        ExpBarText.GetComponent<Text>().text = "lvl " + Lvl;
+    }
+
+    private void PassiveHPRegeneration()
+    {
+        HealHealth(Time.deltaTime * 2.5f); 
+    }
+
+    private void PassiveManaRegeneration()
+    {
+        ChangeMana(Time.deltaTime * 1f);
     }
 
     public void GetDamage(float damage)
@@ -122,12 +519,57 @@ public class Player : MonoBehaviour
             var value = currHP / maxHP;
             HealthBar.GetComponent<Slider>().value = value;
         }
+        UpdateStatsText();
+    }
+
+    public void HealHealth(float health)
+    {
+        currHP += health;
+        if (currHP >= maxHP)
+        {
+            currHP = maxHP;
+        }
+        var value = currHP / maxHP;
+        HealthBar.GetComponent<Slider>().value = value;
+        UpdateStatsText();
     }
 
     public void Die()
     {
         isDead = true;
+        GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
         InGameMenu.GetComponent<InGameMenu>().ShowDeathScreen();
+    }
+
+    public void ChangeMana(float value)
+    {
+        currMana += value;
+        if (currMana <= 0)
+        {
+            currMana = 0;
+        }
+        if (currMana >= maxMana)
+        {
+            currMana = maxMana;
+        }
+        var val = currMana / maxMana;
+        ManaBar.GetComponent<Slider>().value = val;
+        UpdateStatsText();
+    }
+
+    public void GetExp(float value)
+    {
+        currExp += value;
+        while(currExp >= maxExp)
+        {
+            currExp -= maxExp;
+            Lvl += 1;
+            maxExp = GetNextMaxExp();
+            
+        }
+        var val = currExp / maxExp;
+        ExpBar.GetComponent<Slider>().value = val;
+        UpdateStatsText();
     }
 
     private void RotateRot()
@@ -157,7 +599,7 @@ public class Player : MonoBehaviour
             }
         }
         Rot.transform.localEulerAngles = new Vector3(0, 0, angle);
-        Weapon.GetComponent<Weapon>().SetAngle(angle);
+        WeaponInHands.GetComponent<Weapon>().SetAngle(angle);
     }
 
     private void SetVelocity()
@@ -169,6 +611,36 @@ public class Player : MonoBehaviour
         else
         {
             GetComponent<Rigidbody2D>().velocity = moveVector;
+        }
+    }
+
+    private float GetNextMaxExp()
+    {
+        return Lvl * 5 + 10;
+    }
+
+    public void AddCharges(float value)
+    {
+        var toHP = 0.0f;
+        if (FlaskHP != null)
+        {
+            if((FlaskHP.GetComponent<Flask>().maxValue - FlaskHP.GetComponent<Flask>().currentValue) >= value / 2)
+            {
+                toHP = value / 2;
+                if(FlaskMana == null)
+                {
+                    toHP = value;
+                }
+            }
+            else
+            {
+                toHP = FlaskHP.GetComponent<Flask>().maxValue - FlaskHP.GetComponent<Flask>().currentValue;
+            }
+            FlaskHP.GetComponent<Flask>().AddCharges(toHP);
+        }
+        if (FlaskMana != null)
+        {
+            FlaskMana.GetComponent<Flask>().AddCharges(value - toHP);
         }
     }
 
