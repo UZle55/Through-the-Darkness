@@ -27,6 +27,10 @@ public class MonsterWallChecker : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D collision)
     {
-        transform.parent.GetComponent<Monster>().StopTouchingWall(name.Split("_")[1]);
+        if (collision.tag.Equals("Wall"))
+        {
+            transform.parent.GetComponent<Monster>().StopTouchingWall(name.Split("_")[1]);
+        }
+        
     }
 }

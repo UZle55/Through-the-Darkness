@@ -10,6 +10,8 @@ public class MiniMap : MonoBehaviour
     public GameObject roomsParent;
     public GameObject passagesParent;
     public GameObject currentRoomMarker;
+    public Color notCompletedRoom;
+    public Color completedRoom;
     // Start is called before the first frame update
     void Start()
     {
@@ -39,7 +41,7 @@ public class MiniMap : MonoBehaviour
             {
                 if(rooms[i, q] != null)
                 {
-                    roomIcons[i, q].GetComponent<Image>().color = new Color(1, 1, 1, 1);
+                    roomIcons[i, q].GetComponent<Image>().color = notCompletedRoom;
                 }
             }
         }
@@ -79,6 +81,20 @@ public class MiniMap : MonoBehaviour
                 if (rooms[i, q] != null && rooms[i, q].Equals(room))
                 {
                     currentRoomMarker.transform.position = roomIcons[i, q].transform.position;
+                }
+            }
+        }
+    }
+
+    public void HighLightRoom(GameObject room)
+    {
+        for (var i = 0; i < rooms.GetLength(0); i++)
+        {
+            for (var q = 0; q < rooms.GetLength(1); q++)
+            {
+                if (rooms[i, q] != null && rooms[i, q].Equals(room))
+                {
+                    roomIcons[i, q].GetComponent<Image>().color = completedRoom;
                 }
             }
         }

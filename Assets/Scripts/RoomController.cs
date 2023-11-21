@@ -21,6 +21,7 @@ public class RoomController : MonoBehaviour
     public GameObject player;
     public GameObject chest;
     public RoomType roomType = RoomType.Basic;
+    private bool isFirstTimeInRoom = true;
     
     // Start is called before the first frame update
     void Start()
@@ -101,6 +102,11 @@ public class RoomController : MonoBehaviour
         if (collision.tag.Equals("Player"))
         {
             collision.GetComponent<Player>().miniMap.GetComponent<MiniMap>().InsideRoom(this.gameObject);
+            if (isFirstTimeInRoom)
+            {
+                isFirstTimeInRoom = false;
+                collision.GetComponent<Player>().miniMap.GetComponent<MiniMap>().HighLightRoom(this.gameObject);
+            }
         }
     }
 
