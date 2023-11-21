@@ -16,6 +16,8 @@ public class LevelsGenerator : MonoBehaviour
     private bool isBossLvl = false;
     public GameObject allLoot;
     public GameObject allMonsters;
+    public GameObject miniMap;
+    private GameObject[,] roomsMap;
     // Start is called before the first frame update
     void Start()
     {
@@ -49,52 +51,67 @@ public class LevelsGenerator : MonoBehaviour
         var floorLayout = Instantiate(floorLayouts.transform.GetChild(floorLayoutIndex).gameObject);
         floorLayout.transform.position = floorGeneratingSpace.transform.position;
         var roomSpawnPoints = floorLayout.transform.Find("RoomSpawnPoints").gameObject;
+        roomsMap = new GameObject[5, 5];
         for(var i = 0; i < roomSpawnPoints.transform.childCount; i++)
         {
             var roomSpawnPoint = roomSpawnPoints.transform.GetChild(i).gameObject;
+            GameObject room = roomSpawnPoint;
             if(roomSpawnPoint.GetComponent<RoomSpawnPoint>().roomType == RoomSpawnPoint.RoomType.Basic)
             {
                 if (isBossLvl && roomSpawnPoint.GetComponent<RoomSpawnPoint>().isLastBasicOnFloor)
                 {
                     var bossRoomIndex = GetRandomInt(0, bossRooms.transform.childCount - 1);
-                    var bossRoom = Instantiate(bossRooms.transform.GetChild(bossRoomIndex).gameObject);
-                    bossRoom.transform.position = roomSpawnPoint.transform.position;
-                    bossRoom.transform.parent = currentFloorParent.transform;
+                    room = Instantiate(bossRooms.transform.GetChild(bossRoomIndex).gameObject);
+                    room.transform.position = roomSpawnPoint.transform.position;
+                    room.transform.parent = currentFloorParent.transform;
 
-                    DisableUseless(roomSpawnPoint, bossRoom);
-                    GenerateLoot(bossRoom);
-                    GenerateMonsters(bossRoom);
+                    DisableUseless(roomSpawnPoint, room);
+                    GenerateLoot(room);
+                    GenerateMonsters(room);
                 }
                 else
                 {
                     var basicRoomIndex = GetRandomInt(0, basicRooms.transform.childCount - 1);
-                    var basicRoom = Instantiate(basicRooms.transform.GetChild(basicRoomIndex).gameObject);
-                    basicRoom.transform.position = roomSpawnPoint.transform.position;
-                    basicRoom.transform.parent = currentFloorParent.transform;
+                    room = Instantiate(basicRooms.transform.GetChild(basicRoomIndex).gameObject);
+                    room.transform.position = roomSpawnPoint.transform.position;
+                    room.transform.parent = currentFloorParent.transform;
 
-                    DisableUseless(roomSpawnPoint, basicRoom);
-                    GenerateLoot(basicRoom);
-                    GenerateMonsters(basicRoom);
+                    DisableUseless(roomSpawnPoint, room);
+                    GenerateLoot(room);
+                    GenerateMonsters(room);
                 }
             }
             else if (roomSpawnPoint.GetComponent<RoomSpawnPoint>().roomType == RoomSpawnPoint.RoomType.StartRoom)
             {
-                var startRoom1 = Instantiate(startRoom);
-                startRoom1.transform.position = roomSpawnPoint.transform.position;
-                startRoom1.transform.parent = currentFloorParent.transform;
-                MovePlayerTo(startRoom1.transform.position);
+                room = Instantiate(startRoom);
+                room.transform.position = roomSpawnPoint.transform.position;
+                room.transform.parent = currentFloorParent.transform;
+                MovePlayerTo(room.transform.position);
 
-                DisableUseless(roomSpawnPoint, startRoom1);
+                DisableUseless(roomSpawnPoint, room);
             }
             else if (roomSpawnPoint.GetComponent<RoomSpawnPoint>().roomType == RoomSpawnPoint.RoomType.EndRoom)
             {
-                var endRoom1 = Instantiate(endRoom);
-                endRoom1.transform.position = roomSpawnPoint.transform.position;
-                endRoom1.transform.parent = currentFloorParent.transform;
+                room = Instantiate(endRoom);
+                room.transform.position = roomSpawnPoint.transform.position;
+                room.transform.parent = currentFloorParent.transform;
 
-                DisableUseless(roomSpawnPoint, endRoom1);
+                DisableUseless(roomSpawnPoint, room);
             }
+
+            roomsMap[roomSpawnPoint.GetComponent<RoomSpawnPoint>().lineIndex - 1, roomSpawnPoint.GetComponent<RoomSpawnPoint>().rowIndex - 1] = room;
         }
+        miniMap.GetComponent<MiniMap>().SetRooms(roomsMap);
+
+        var passageNumbers = new List<string>();
+        var passages = floorLayout.transform.Find("Passages").gameObject;
+        for (var i = 0; i < passages.transform.childCount; i++)
+        {
+            var parts = passages.transform.GetChild(i).gameObject.name.Split(" ", 2);
+            var number = parts[1];
+            passageNumbers.Add(number);
+        }
+        miniMap.GetComponent<MiniMap>().SetPassages(passageNumbers);
 
         Destroy(floorLayout);
     }
@@ -102,6 +119,7 @@ public class LevelsGenerator : MonoBehaviour
     private void GenerateLoot(GameObject room)
     {
         var chest = room.GetComponent<RoomController>().chest;
+        chest.GetComponent<Chest>().coinsCount = GetRandomInt(currentFloorNumber + 4, currentFloorNumber * 2 + 8);
         var currLootInChestCount = 0;
         var resultLoot = new List<GameObject>();
         while(currLootInChestCount < 4)
@@ -205,7 +223,9 @@ public class LevelsGenerator : MonoBehaviour
         if (from == to)
             return from;
         var rnd = (int)Random.Range((float)from, (float)(to + 1));
-        if(rnd == to + 1)
+        rnd = (int)Random.Range((float)from, (float)(to + 1));
+        rnd = (int)Random.Range((float)from, (float)(to + 1));
+        if (rnd == to + 1)
         {
             rnd = to;
         }

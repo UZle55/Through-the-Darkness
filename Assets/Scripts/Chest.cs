@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Chest : MonoBehaviour
 {
@@ -15,6 +17,12 @@ public class Chest : MonoBehaviour
     private bool isLootDropping = false;
     public GameObject[] Loot; //максимум 4 предмета
     private Vector3[] lootPointsToMove = new Vector3[4];
+    public int coinsCount = 7;
+    public GameObject coinExample;
+    private Tuple<GameObject, Vector3>[] coins;
+    private bool isMovingCoins = false;
+    private float movingTimes = 0;
+    private float movingTimeBetween = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -25,6 +33,7 @@ public class Chest : MonoBehaviour
     void Update()
     {
         t += Time.deltaTime;
+        movingTimeBetween += Time.deltaTime;
         if (isPlayingAni)
         {
             if(aniSpriteIndex < openingChestSprites.Length)
@@ -38,6 +47,22 @@ public class Chest : MonoBehaviour
                     {
                         DropLoot();
                     }
+                }
+            }
+        }
+
+        if (isMovingCoins && movingTimeBetween > 0.25f)
+        {
+            if(movingTimes < 1)
+            {
+                MoveCoins();
+            }
+            if(movingTimes >= 1)
+            {
+                isMovingCoins = false;
+                foreach (var coin in coins)
+                {
+                    coin.Item1.GetComponent<Coin>().FollowPlayer();
                 }
             }
         }
@@ -68,12 +93,15 @@ public class Chest : MonoBehaviour
                     }
                 }
                 isLootDropped = true;
+                isLootDropping = false;
             }
         }
 
         if (isLootDropped)
         {
-            Destroy(this.gameObject);
+            Destroy(GetComponent<BoxCollider2D>());
+            Player.GetComponent<Player>().DeleteChestToOpen();
+            isLootDropped = false;
         }
     }
 
@@ -101,6 +129,7 @@ public class Chest : MonoBehaviour
     private void DropLoot()
     {
         isLootDropping = true;
+        SpawnCoins();
 
     }
 
@@ -125,5 +154,48 @@ public class Chest : MonoBehaviour
         {
             Player.GetComponent<Player>().DeleteChestToOpen();
         }
+    }
+
+    private void SpawnCoins()
+    {
+        coins = new Tuple<GameObject, Vector3>[coinsCount];
+        for(var i = 0; i < coinsCount; i++)
+        {
+            var coin = Instantiate(coinExample, null);
+            coin.transform.position = new Vector3(transform.position.x, transform.position.y, -3);
+            var throwVector = new Vector3(coin.transform.position.x + GetRandomInt(-75, 75), coin.transform.position.y + 25, coin.transform.position.z);
+            var dir = throwVector - transform.position;
+            coins[i] = Tuple.Create(coin, dir);
+        }
+        isMovingCoins = true;
+        movingTimeBetween = 0;
+        MoveCoins();
+    }
+
+    private void MoveCoins()
+    {
+        for (var i = 0; i < coinsCount; i++)
+        {
+            var dir = coins[i].Item2;
+            var c = Mathf.Sqrt(dir.x * dir.x + dir.y * dir.y);
+            var coef = 500 / c;
+            coins[i].Item1.GetComponent<Rigidbody2D>().AddForce(dir * coef);
+        }
+        movingTimeBetween = 0;
+        movingTimes++;
+    }
+
+    private int GetRandomInt(int from, int to)
+    {
+        if (from == to)
+            return from;
+        var rnd = (int)Random.Range((float)from, (float)(to + 1));
+        rnd = (int)Random.Range((float)from, (float)(to + 1));
+        rnd = (int)Random.Range((float)from, (float)(to + 1));
+        if (rnd == to + 1)
+        {
+            rnd = to;
+        }
+        return rnd;
     }
 }

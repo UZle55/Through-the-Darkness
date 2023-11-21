@@ -16,6 +16,8 @@ public class RoomSpawnPoint : MonoBehaviour
     public bool hasPassageRight = true;
     public RoomType roomType = RoomType.Basic;
     public bool isLastBasicOnFloor = false;
+    public int lineIndex;
+    public int rowIndex;
     // Start is called before the first frame update
     void Start()
     {

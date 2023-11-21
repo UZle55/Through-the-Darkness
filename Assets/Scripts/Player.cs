@@ -38,6 +38,9 @@ public class Player : MonoBehaviour
     public GameObject flaskHPButtonIcon;
     public GameObject flaskManaButtonIcon;
     public GameObject levelsGenerator;
+    public GameObject coinsCountText;
+    private int coinsCount;
+    public GameObject miniMap;
 
     public float hp;
     public GameObject healthBar;
@@ -100,6 +103,7 @@ public class Player : MonoBehaviour
     {
         if (!isDead)
         {
+
             if (nextMoveSpeed != moveSpeed)
             {
                 moveSpeed = nextMoveSpeed;
@@ -207,9 +211,26 @@ public class Player : MonoBehaviour
             PassiveManaRegeneration();
 
             CheckWeaponsAndFlasksOnGround();
+
+            UpdateCoinsCount();
             //UpdateStatsText();
         }
         
+    }
+
+    private void UpdateCoinsCount()
+    {
+        coinsCountText.GetComponent<Text>().text = coinsCount.ToString();
+    }
+
+    public int GetCoinsCount()
+    {
+        return coinsCount;
+    }
+
+    public void ChangeCoinsCount(int value)
+    {
+        coinsCount += value;
     }
 
     public void SetChestToOpen(GameObject chest)

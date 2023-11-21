@@ -95,4 +95,25 @@ public class RoomController : MonoBehaviour
             door.GetComponent<SpriteRenderer>().color = Color.white;
         }
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag.Equals("Player"))
+        {
+            collision.GetComponent<Player>().miniMap.GetComponent<MiniMap>().InsideRoom(this.gameObject);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.tag.Equals("Player"))
+        {
+            var miniMap = collision.GetComponent<Player>().miniMap;
+            if(miniMap != null)
+            {
+                miniMap.GetComponent<MiniMap>().OutsideRooms();
+            }
+            
+        }
+    }
 }
