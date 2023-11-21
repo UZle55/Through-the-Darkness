@@ -10,10 +10,12 @@ public class InGameMenu : MonoBehaviour
     public GameObject Info;
     public GameObject KeyBindsAndOther;
     public KeyCode pause;
+    private bool isKeyBindsOpened = false;
     // Start is called before the first frame update
     void Start()
     {
         KeyBindsAndOther.SetActive(true);
+        isKeyBindsOpened = true;
     }
 
     // Update is called once per frame
@@ -23,10 +25,17 @@ public class InGameMenu : MonoBehaviour
         Application.targetFrameRate = 9999;
 
         Info.GetComponent<Text>().text = ((int)(1 / Time.deltaTime)).ToString();
-        if (Input.GetKeyDown(pause))
+        if (Input.GetKeyDown(pause) && !isKeyBindsOpened)
         {
             KeyBindsAndOther.SetActive(true);
+            isKeyBindsOpened = true;
             Time.timeScale = 0;
+        }
+        else if (Input.GetKeyDown(pause) && isKeyBindsOpened)
+        {
+            KeyBindsAndOther.SetActive(false);
+            isKeyBindsOpened = false;
+            Time.timeScale = 1;
         }
     }
 

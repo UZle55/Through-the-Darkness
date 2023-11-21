@@ -65,6 +65,11 @@ public class Monster : MonoBehaviour
     private bool isKnockingBack = false;
     private float durationKnockingBack = 0;
     public bool canKnockingBack = true;
+
+    private bool isGoingStraight = false;
+    private float timeGoingStraight = 0;
+    private bool[] isGoingAroundArray = new bool[3];
+    private float[] goingAroundTimers = new float[3];
     // Start is called before the first frame update
     void Start()
     {
@@ -87,13 +92,66 @@ public class Monster : MonoBehaviour
             if (isGoingAround)
             {
                 timeGoingAround += Time.deltaTime;
-                if (timeGoingAround > 0.5f)
+                if (timeGoingAround > 0.5f )
                 {
                     isGoingAround = false;
                     chosenDirection = null;
                     timeGoingAround = 0;
+                    var isAnyFalse = false;
+                    for (var i = 0; i < isGoingAroundArray.Length; i++)
+                    {
+                        
+                        if (!isGoingAroundArray[i])
+                        {
+                            isAnyFalse = true;
+                            isGoingAroundArray[i] = true;
+                            break;
+                        }
+                    }
+                    if (!isAnyFalse)
+                    {
+                        var max = -1f;
+                        var indexToUpdate = -1;
+                        for (var q = 0; q < goingAroundTimers.Length; q++)
+                        {
+                            if (goingAroundTimers[q] > max)
+                            {
+                                indexToUpdate = q;
+                            }
+                        }
+                        goingAroundTimers[indexToUpdate] = 0;
+                    }
                 }
             }
+
+            isGoingStraight = false;
+            var count = 0;
+            for (var i = 0; i < isGoingAroundArray.Length; i++)
+            {
+                if (isGoingAroundArray[i])
+                {
+                    count++;
+                    goingAroundTimers[i] += Time.deltaTime;
+                    if(goingAroundTimers[i] > 5f)
+                    {
+                        goingAroundTimers[i] = 0;
+                        isGoingAroundArray[i] = false;
+                        count--;
+                    }
+                }
+            }
+            if (count == 3)
+            {
+                isGoingStraight = true;
+            }
+
+            if (isGoingStraight)
+            {
+                timeGoingStraight += Time.deltaTime;
+                var dir = (player.transform.position - transform.position) / 5;
+                SetVelocity(dir);
+            }
+
 
             distanceToPlayer = GetDistance(transform.position, player.transform.position);
 
@@ -273,7 +331,7 @@ public class Monster : MonoBehaviour
                         isSeePlayer = false;
                         break;
                     }
-                    if (!isMonsterAhead && hit.collider.tag.Equals("Monster") && !hit.collider.gameObject.name.Equals(name))
+                    if (!isMonsterAhead && hit.collider.tag.Equals("Monster") && !hit.collider.gameObject.Equals(gameObject))
                     {
                         var distance = GetDistance(hit.collider.transform.position, transform.position);
                         if (distance < 1.25f)
@@ -291,24 +349,22 @@ public class Monster : MonoBehaviour
             }  
         }
         var dir = (player.transform.position - transform.position) / 5;
-        if (!isTouchingWall && !isMonsterAhead && !isGoingAround && timeEndedTouchingWall > timeCanGoAfterWall)
+        if (!isGoingStraight)
         {
-            
-            
-            SetVelocity(dir);
-        }
-        else if ((!isTouchingWall && isMonsterAhead) || isGoingAround)
-        {
-            
-            isGoingAround = true;
-            SetVelocity(GetDirAround(monsterAheadPos));
-        }
-        else if(!isGoingAround && (isTouchingWall || timeEndedTouchingWall < timeCanGoAfterWall))
-        {
+            if (!isTouchingWall && !isMonsterAhead && !isGoingAround && timeEndedTouchingWall > timeCanGoAfterWall)
+            {
+                SetVelocity(dir);
+            }
+            else if ((!isTouchingWall && isMonsterAhead) || isGoingAround)
+            {
 
-            
-
-            SetVelocity(FindDirection());
+                isGoingAround = true;
+                SetVelocity(GetDirAround(monsterAheadPos));
+            }
+            else if (!isGoingAround && (isTouchingWall || timeEndedTouchingWall < timeCanGoAfterWall))
+            {
+                SetVelocity(FindDirection());
+            }
         }
     }
 

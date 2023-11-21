@@ -5,15 +5,22 @@ using UnityEngine;
 
 public class RoomController : MonoBehaviour
 {
+    public enum RoomType
+    {
+        StartRoom,
+        Basic,
+        BossRoom,
+        EndRoom
+    }
     public GameObject[] Doors;
     public GameObject[] ProjectileDestroyers;
     private bool isRoomStarted = false;
     private bool isRoomFinished = false;
-    public GameObject MeleeMonstersParent;
-    public GameObject RangeMonstersParent;
-    public GameObject BossesParent;
-    public GameObject Player;
-    public GameObject Chest;
+    public GameObject monstersParent;
+    public GameObject bossesParent;
+    public GameObject player;
+    public GameObject chest;
+    public RoomType roomType = RoomType.Basic;
     
     // Start is called before the first frame update
     void Start()
@@ -26,9 +33,8 @@ public class RoomController : MonoBehaviour
     {
         if (isRoomStarted)
         {
-            if(MeleeMonstersParent.transform.childCount == 0 
-                && RangeMonstersParent.transform.childCount == 0
-                && BossesParent.transform.childCount == 0
+            if(monstersParent.transform.childCount == 0 
+                && bossesParent.transform.childCount == 0
                 && !isRoomFinished)
             {
                 FinishRoom();
@@ -41,24 +47,19 @@ public class RoomController : MonoBehaviour
     {
         if (!isRoomStarted)
         {
-            Player = player;
-            Player.GetComponent<Player>().isClearingRoom = true;
+            this.player = player;
+            this.player.GetComponent<Player>().isClearingRoom = true;
             isRoomStarted = true;
             CloseDoors();
 
-            for(var i = 0; i < MeleeMonstersParent.transform.childCount; i++)
+            for(var i = 0; i < monstersParent.transform.childCount; i++)
             {
-                MeleeMonstersParent.transform.GetChild(i).gameObject.GetComponent<Monster>().isActive = true;
+                monstersParent.transform.GetChild(i).gameObject.GetComponent<Monster>().isActive = true;
             }
 
-            for (var i = 0; i < RangeMonstersParent.transform.childCount; i++)
+            for (var i = 0; i < bossesParent.transform.childCount; i++)
             {
-                RangeMonstersParent.transform.GetChild(i).gameObject.GetComponent<Monster>().isActive = true;
-            }
-
-            for (var i = 0; i < BossesParent.transform.childCount; i++)
-            {
-                BossesParent.transform.GetChild(i).gameObject.GetComponent<Monster>().isActive = true;
+                bossesParent.transform.GetChild(i).gameObject.GetComponent<Monster>().isActive = true;
             }
         }
         
@@ -81,9 +82,9 @@ public class RoomController : MonoBehaviour
     private void FinishRoom()
     {
         isRoomFinished = true;
-        Player.GetComponent<Player>().isClearingRoom = false;
+        player.GetComponent<Player>().isClearingRoom = false;
         OpenDoors();
-        Chest.SetActive(true);
+        chest.SetActive(true);
     }
 
     private void OpenDoors()                

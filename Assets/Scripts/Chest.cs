@@ -18,17 +18,7 @@ public class Chest : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        lootPointsToMove[0] = new Vector3(transform.position.x, transform.position.y + 1, transform.position.z);
-        lootPointsToMove[1] = new Vector3(transform.position.x + 1, transform.position.y, transform.position.z);
-        lootPointsToMove[2] = new Vector3(transform.position.x - 1, transform.position.y, transform.position.z);
-        lootPointsToMove[3] = new Vector3(transform.position.x, transform.position.y - 1, transform.position.z);
-        for (var i = 0; i < Loot.Length; i++)
-        {
-            Loot[i] = Instantiate(Loot[i], null);
-            Loot[i].transform.position = new Vector3(1000, 1000, -1);
-        }
-
-        gameObject.SetActive(false);
+        
     }
 
     // Update is called once per frame
@@ -85,6 +75,21 @@ public class Chest : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+    }
+
+    public void Prepare()
+    {
+        lootPointsToMove[0] = new Vector3(transform.position.x, transform.position.y + 1, transform.position.z);
+        lootPointsToMove[1] = new Vector3(transform.position.x + 1, transform.position.y, transform.position.z);
+        lootPointsToMove[2] = new Vector3(transform.position.x - 1, transform.position.y, transform.position.z);
+        lootPointsToMove[3] = new Vector3(transform.position.x, transform.position.y - 1, transform.position.z);
+        for (var i = 0; i < Loot.Length; i++)
+        {
+            Loot[i] = Instantiate(Loot[i], null);
+            Loot[i].transform.position = new Vector3(1000, 1000, -1);
+        }
+
+        gameObject.SetActive(false);
     }
 
     public void Open()
