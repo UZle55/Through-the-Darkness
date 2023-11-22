@@ -6,6 +6,14 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
+    public enum Class
+    {
+        Archer,
+        Mage,
+        Summoner,
+        Melee
+    }
+    public Class playerClass;
     public KeyCode moveUp;
     public KeyCode moveDown;
     public KeyCode moveLeft;
@@ -16,6 +24,8 @@ public class Player : MonoBehaviour
     public KeyCode Interact;
     public KeyCode useHPFlask;
     public KeyCode useManaFlask;
+    public KeyCode ability1Activate;
+    public KeyCode ability2Activate;
     public int nextMoveSpeed;
     private int moveSpeed;
     private float diagonalMovingCoef;
@@ -70,6 +80,9 @@ public class Player : MonoBehaviour
     private GameObject chestToOpen;
     private GameObject portal;
     private bool canClickOnPortal = false;
+
+    private bool isAbility1Active = false;
+    private bool isAbility2Active = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -223,6 +236,16 @@ public class Player : MonoBehaviour
                 var isUsed = flaskMana.GetComponent<Flask>().Use();
             }
 
+            if (Input.GetKeyDown(ability1Activate))
+            {
+                GetComponent<AbilitiesManager>().Ability1Click();
+            }
+
+            if (Input.GetKeyDown(ability2Activate))
+            {
+                GetComponent<AbilitiesManager>().Ability2Click();
+            }
+
             //PassiveHPRegeneration();
 
             PassiveManaRegeneration();
@@ -233,6 +256,26 @@ public class Player : MonoBehaviour
             //UpdateStatsText();
         }
         
+    }
+
+    public void Ability1Activate()
+    {
+        isAbility1Active = true;
+    }
+
+    public void Ability2Activate()
+    {
+        isAbility2Active = true;
+    }
+
+    public void Ability1Disactivate()
+    {
+        isAbility1Active = false;
+    }
+
+    public void Ability2Disactivate()
+    {
+        isAbility2Active = false;
     }
 
     private void UpdateCoinsCount()
@@ -648,17 +691,20 @@ public class Player : MonoBehaviour
 
     public void GetDamage(float damage)
     {
-        currHP -= damage;
-        if (currHP <= 0)
+        if (!isAbility1Active)
         {
-            Die();
+            currHP -= damage;
+            if (currHP <= 0)
+            {
+                Die();
+            }
+            else
+            {
+                var value = currHP / maxHP;
+                healthBar.GetComponent<Slider>().value = value;
+            }
+            UpdateStatsText();
         }
-        else
-        {
-            var value = currHP / maxHP;
-            healthBar.GetComponent<Slider>().value = value;
-        }
-        UpdateStatsText();
     }
 
     public void HealHealth(float health)
@@ -743,14 +789,29 @@ public class Player : MonoBehaviour
 
     private void SetVelocity()
     {
-        if(moveVector.x != 0 && moveVector.y != 0)
+        if (!isAbility2Active)
         {
-            GetComponent<Rigidbody2D>().velocity = new Vector2(moveVector.x * diagonalMovingCoef, moveVector.y * diagonalMovingCoef);
+            if (moveVector.x != 0 && moveVector.y != 0)
+            {
+                GetComponent<Rigidbody2D>().velocity = new Vector2(moveVector.x * diagonalMovingCoef, moveVector.y * diagonalMovingCoef);
+            }
+            else
+            {
+                GetComponent<Rigidbody2D>().velocity = moveVector;
+            }
         }
         else
         {
-            GetComponent<Rigidbody2D>().velocity = moveVector;
+            if (moveVector.x != 0 && moveVector.y != 0)
+            {
+                GetComponent<Rigidbody2D>().velocity = new Vector2(moveVector.x * diagonalMovingCoef * 1.5f, moveVector.y * diagonalMovingCoef);
+            }
+            else
+            {
+                GetComponent<Rigidbody2D>().velocity = moveVector * 1.5f;
+            }
         }
+        
     }
 
     private float GetNextMaxExp()
