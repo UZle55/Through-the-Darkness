@@ -21,6 +21,7 @@ public class Player : MonoBehaviour
     private float diagonalMovingCoef;
     private Vector2 moveVector = new Vector2(0, 0);
     private bool isDead = false;
+    private bool isHoldingAttackButton = false;
 
     public GameObject info;
     public GameObject rot;
@@ -41,6 +42,7 @@ public class Player : MonoBehaviour
     public GameObject coinsCountText;
     private int coinsCount;
     public GameObject miniMap;
+    public GameObject lootStats;
 
     public float hp;
     public GameObject healthBar;
@@ -101,6 +103,19 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (isHoldingAttackButton)
+        {
+            if (currMana >= weaponInHands.GetComponent<Weapon>().attackManaCost)
+            {
+                var isAttacked = weaponInHands.GetComponent<Weapon>().Attack();
+                if (isAttacked)
+                {
+                    ChangeMana(-weaponInHands.GetComponent<Weapon>().attackManaCost);
+                }
+            }
+        }
+
+
         if (!isDead)
         {
 
@@ -151,6 +166,8 @@ public class Player : MonoBehaviour
 
             if (Input.GetKeyDown(attack))
             {
+                if(weaponInHands.GetComponent<Weapon>().type != Weapon.Type.Bow)
+                    isHoldingAttackButton = true;
                 if(currMana >= weaponInHands.GetComponent<Weapon>().attackManaCost)
                 {
                     var isAttacked = weaponInHands.GetComponent<Weapon>().Attack();
@@ -164,7 +181,7 @@ public class Player : MonoBehaviour
 
             if (Input.GetKeyUp(attack))
             {
-                var a = 0;
+                isHoldingAttackButton = false;
             }
 
             if (Input.GetKeyDown(switchWeapon))
@@ -313,20 +330,24 @@ public class Player : MonoBehaviour
                     {
                         flaskToPickUp = null;
                         canClickOnPortal = false;
-                        ShowTextAbovePlayer(weaponToPickUp.name, -1);
+                        ShowTextAbovePlayer(weaponToPickUp.GetComponent<Weapon>().weaponName, -1);
+                        lootStats.SetActive(true);
+                        lootStats.transform.GetChild(0).gameObject.GetComponent<Text>().text = weaponToPickUp.GetComponent<Weapon>().GetStatsText();
                     }
                     else if (distanceToFlask < distanceToPortal && distanceToFlask < distanceToWeapon)
                     {
                         weaponToPickUp = null;
                         canClickOnPortal = false;
-                        ShowTextAbovePlayer(flaskToPickUp.name, -1);
+                        ShowTextAbovePlayer(flaskToPickUp.GetComponent<Flask>().flaskName, -1);
+                        lootStats.SetActive(true);
+                        lootStats.transform.GetChild(0).gameObject.GetComponent<Text>().text = flaskToPickUp.GetComponent<Flask>().GetStatsText();
                     }
                     else if(distanceToPortal <= distanceToWeapon && distanceToPortal <= distanceToFlask)
                     {
                         weaponToPickUp = null;
                         flaskToPickUp = null;
                         canClickOnPortal = true;
-                        ShowTextAbovePlayer(portal.name, -1);
+                        ShowTextAbovePlayer("Портал", -1);
                     }
                 }
                 else if (weaponToPickUp != null && flaskToPickUp == null)
@@ -334,13 +355,15 @@ public class Player : MonoBehaviour
                     if (distanceToWeapon < distanceToPortal)
                     {
                         canClickOnPortal = false;
-                        ShowTextAbovePlayer(weaponToPickUp.name, -1);
+                        ShowTextAbovePlayer(weaponToPickUp.GetComponent<Weapon>().weaponName, -1);
+                        lootStats.SetActive(true);
+                        lootStats.transform.GetChild(0).gameObject.GetComponent<Text>().text = weaponToPickUp.GetComponent<Weapon>().GetStatsText();
                     }
                     else
                     {
                         weaponToPickUp = null;
                         canClickOnPortal = true;
-                        ShowTextAbovePlayer(portal.name, -1);
+                        ShowTextAbovePlayer("Портал", -1);
                     }
                 }
                 else if (weaponToPickUp == null && flaskToPickUp != null)
@@ -348,19 +371,21 @@ public class Player : MonoBehaviour
                     if (distanceToFlask < distanceToPortal)
                     {
                         canClickOnPortal = false;
-                        ShowTextAbovePlayer(flaskToPickUp.name, -1);
+                        ShowTextAbovePlayer(flaskToPickUp.GetComponent<Flask>().flaskName, -1);
+                        lootStats.SetActive(true);
+                        lootStats.transform.GetChild(0).gameObject.GetComponent<Text>().text = flaskToPickUp.GetComponent<Flask>().GetStatsText();
                     }
                     else
                     {
                         flaskToPickUp = null;
                         canClickOnPortal = true;
-                        ShowTextAbovePlayer(portal.name, -1);
+                        ShowTextAbovePlayer("Портал", -1);
                     }
                 }
                 else
                 {
                     canClickOnPortal = true;
-                    ShowTextAbovePlayer(portal.name, -1);
+                    ShowTextAbovePlayer("Портал", -1);
                 }
             }
             else
@@ -370,21 +395,29 @@ public class Player : MonoBehaviour
                     if (distanceToWeapon < distanceToFlask)
                     {
                         flaskToPickUp = null;
-                        ShowTextAbovePlayer(weaponToPickUp.name, -1);
+                        ShowTextAbovePlayer(weaponToPickUp.GetComponent<Weapon>().weaponName, -1);
+                        lootStats.SetActive(true);
+                        lootStats.transform.GetChild(0).gameObject.GetComponent<Text>().text = weaponToPickUp.GetComponent<Weapon>().GetStatsText();
                     }
                     else if (distanceToWeapon >= distanceToFlask)
                     {
                         weaponToPickUp = null;
-                        ShowTextAbovePlayer(flaskToPickUp.name, -1);
+                        ShowTextAbovePlayer(flaskToPickUp.GetComponent<Flask>().flaskName, -1);
+                        lootStats.SetActive(true);
+                        lootStats.transform.GetChild(0).gameObject.GetComponent<Text>().text = flaskToPickUp.GetComponent<Flask>().GetStatsText();
                     }
                 }
                 else if (weaponToPickUp != null && flaskToPickUp == null)
                 {
-                    ShowTextAbovePlayer(weaponToPickUp.name, -1);
+                    ShowTextAbovePlayer(weaponToPickUp.GetComponent<Weapon>().weaponName, -1);
+                    lootStats.SetActive(true);
+                    lootStats.transform.GetChild(0).gameObject.GetComponent<Text>().text = weaponToPickUp.GetComponent<Weapon>().GetStatsText();
                 }
                 else if (weaponToPickUp == null && flaskToPickUp != null)
                 {
-                    ShowTextAbovePlayer(flaskToPickUp.name, -1);
+                    ShowTextAbovePlayer(flaskToPickUp.GetComponent<Flask>().flaskName, -1);
+                    lootStats.SetActive(true);
+                    lootStats.transform.GetChild(0).gameObject.GetComponent<Text>().text = flaskToPickUp.GetComponent<Flask>().GetStatsText();
                 }
                 else
                 {
@@ -401,11 +434,19 @@ public class Player : MonoBehaviour
         {
             Invoke("StopShowingTextAbovePlayer", seconds);
         }
+        if (lootStats.activeSelf && (text.Equals("Портал") || text.Equals("Сундук")))
+        {
+            lootStats.SetActive(false);
+        }
     }
 
     private void StopShowingTextAbovePlayer()
     {
         abovePlayerText.GetComponent<Text>().text = "";
+        if (lootStats.activeSelf)
+        {
+            lootStats.SetActive(false);
+        }
     }
 
     private void PickUpWeapon(GameObject weapon)

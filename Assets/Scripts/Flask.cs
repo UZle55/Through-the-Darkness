@@ -16,6 +16,8 @@ public class Flask : MonoBehaviour
     private float t = 0;
     private bool isUsing = false;
     private float alreadyRecovered = 0;
+    public string[] stats;
+    public string flaskName;
 
     public GameObject IconOnScreen;
     public GameObject usageProgressBar;
@@ -101,5 +103,20 @@ public class Flask : MonoBehaviour
         {
             usageProgressBar.SetActive(false);
         }
+    }
+
+    public string GetStatsText()
+    {
+        var result = "";
+        for (var i = 0; i < stats.Length; i++)
+        {
+            result += stats[i];
+            if (i != stats.Length - 1)
+            {
+                result += "\n";
+            }
+
+        }
+        return result;
     }
 }

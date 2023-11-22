@@ -118,11 +118,12 @@ public class Staff : Weapon
             {
                 isStaffGoingUp = true;
                 isStaffGoingDown = false;
+                var isCrit = GetRandomInt(1, 100) <= criticalChance;
                 if (!isTriple)
                 {
                     var sphere1 = Instantiate(MagicSphere, MagicSphereStartPoint.transform.position, new Quaternion());
                     var dir1 = (mainSpherePoint.transform.position - transform.parent.position) / 5;
-                    sphere1.GetComponent<MagicSphere>().GoInDirection(dir1, isMonsterWeapon, magicSphereVelocity, damage, maxDistance);
+                    sphere1.GetComponent<MagicSphere>().GoInDirection(dir1, isMonsterWeapon, magicSphereVelocity, damage, maxDistance, isCrit, criticalMultiplayer);
                 }
                 else if (isTriple)
                 {
@@ -132,9 +133,9 @@ public class Staff : Weapon
                     var dir1 = (mainSpherePoint.transform.position - transform.parent.position) / 5;
                     var dir2 = (secondarySpherePoint1.transform.position - transform.parent.position) / 5;
                     var dir3 = (secondarySpherePoint2.transform.position - transform.parent.position) / 5;
-                    sphere1.GetComponent<MagicSphere>().GoInDirection(dir1, isMonsterWeapon, magicSphereVelocity, damage, maxDistance);
-                    sphere2.GetComponent<MagicSphere>().GoInDirection(dir2, isMonsterWeapon, magicSphereVelocity, damage, maxDistance);
-                    sphere3.GetComponent<MagicSphere>().GoInDirection(dir3, isMonsterWeapon, magicSphereVelocity, damage, maxDistance);
+                    sphere1.GetComponent<MagicSphere>().GoInDirection(dir1, isMonsterWeapon, magicSphereVelocity, damage, maxDistance, isCrit, criticalMultiplayer);
+                    sphere2.GetComponent<MagicSphere>().GoInDirection(dir2, isMonsterWeapon, magicSphereVelocity, damage, maxDistance, isCrit, criticalMultiplayer);
+                    sphere3.GetComponent<MagicSphere>().GoInDirection(dir3, isMonsterWeapon, magicSphereVelocity, damage, maxDistance, isCrit, criticalMultiplayer);
                 }
             }
         }

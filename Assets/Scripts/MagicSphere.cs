@@ -9,10 +9,13 @@ public class MagicSphere : MonoBehaviour
     private bool isGoing = false;
     private Vector2 dir;
     public float velocity = 0;
-    public float damage = 0;
+    public int damage = 0;
+    public int avgDamage = 0;
     public float maxDistance = 0;
     private Vector2 startPoint;
-    
+    public float criticalMultiplayer;
+    public bool isCritical;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -32,15 +35,18 @@ public class MagicSphere : MonoBehaviour
         }
     }
 
-    public void GoInDirection(Vector2 dir, bool isMonsterSphere, float velocity, float damage, float maxDistance)
+    public void GoInDirection(Vector2 dir, bool isMonsterSphere, float velocity, float damage, float maxDistance, bool isCrit, float critMulti)
     {
         this.dir = dir;
         this.isMonsterSphere = isMonsterSphere;
         this.velocity = velocity;
-        this.damage = damage;
+        avgDamage = Mathf.RoundToInt(damage);
+        this.damage = avgDamage + GetRandomInt(-Mathf.RoundToInt(avgDamage * 0.2f), Mathf.RoundToInt(avgDamage * 0.2f));
         isGoing = true;
         startPoint = transform.position;
         this.maxDistance = maxDistance;
+        isCritical = isCrit;
+        criticalMultiplayer = critMulti;
         SetVelocity(dir);
     }
 
@@ -53,7 +59,14 @@ public class MagicSphere : MonoBehaviour
         }
         else if(collision.tag.Equals("Monster") && !isMonsterSphere)
         {
-            collision.gameObject.GetComponent<Monster>().GetDamage(damage);
+            if (isCritical)
+            {
+                collision.gameObject.GetComponent<Monster>().GetDamage(Mathf.RoundToInt(damage * criticalMultiplayer), avgDamage, isCritical);
+            }
+            else
+            {
+                collision.gameObject.GetComponent<Monster>().GetDamage(damage, avgDamage, isCritical);
+            }
             Destroy(this.gameObject);
         }
         else if (collision.tag.Equals("Wall"))
@@ -82,5 +95,19 @@ public class MagicSphere : MonoBehaviour
         GetComponent<Rigidbody2D>().velocity = dir * coef;
         //info.GetComponent<Text>().text = "c: " + c + "  coef: " + coef + "  vel: " + GetComponent<Rigidbody2D>().velocity.ToString();
 
+    }
+
+    public int GetRandomInt(int from, int to)
+    {
+        if (from == to)
+            return from;
+        var rnd = (int)Random.Range((float)from, (float)(to + 1));
+        rnd = (int)Random.Range((float)from, (float)(to + 1));
+        rnd = (int)Random.Range((float)from, (float)(to + 1));
+        if (rnd == to + 1)
+        {
+            rnd = to;
+        }
+        return rnd;
     }
 }
