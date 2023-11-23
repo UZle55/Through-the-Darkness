@@ -20,12 +20,16 @@ public class Staff : Weapon
     public float magicSphereVelocity = 1;
     public float maxDistance = 1;
     public GameObject staffSprite;
+    public bool isTriple = false;
     //private List<GameObject> touchingEnemies = new List<GameObject>();
 
     public GameObject RotatingPoint;
     public GameObject RotatingAniPoint;
     public GameObject MagicSphereStartPoint;
     public GameObject MagicSphere;
+    public GameObject mainSpherePoint;
+    public GameObject secondarySpherePoint1;
+    public GameObject secondarySpherePoint2;
     // Start is called before the first frame update
     void Start()
     {
@@ -114,19 +118,25 @@ public class Staff : Weapon
             {
                 isStaffGoingUp = true;
                 isStaffGoingDown = false;
-
-                var sphere = Instantiate(MagicSphere, MagicSphereStartPoint.transform.position, new Quaternion());
-                var dir = new Vector2();
-                if (isMonsterWeapon)
+                var isCrit = GetRandomInt(1, 100) <= criticalChance;
+                if (!isTriple)
                 {
-                    dir = (transform.parent.gameObject.GetComponent<Monster>().player.transform.position - MagicSphereStartPoint.transform.position) / 5;
+                    var sphere1 = Instantiate(MagicSphere, MagicSphereStartPoint.transform.position, new Quaternion());
+                    var dir1 = (mainSpherePoint.transform.position - transform.parent.position) / 5;
+                    sphere1.GetComponent<MagicSphere>().GoInDirection(dir1, isMonsterWeapon, magicSphereVelocity, damage, maxDistance, isCrit, criticalMultiplayer);
                 }
-                else
+                else if (isTriple)
                 {
-                    dir = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - MagicSphereStartPoint.transform.position) / 5;
-
+                    var sphere1 = Instantiate(MagicSphere, MagicSphereStartPoint.transform.position, new Quaternion());
+                    var sphere2 = Instantiate(MagicSphere, MagicSphereStartPoint.transform.position, new Quaternion());
+                    var sphere3 = Instantiate(MagicSphere, MagicSphereStartPoint.transform.position, new Quaternion());
+                    var dir1 = (mainSpherePoint.transform.position - transform.parent.position) / 5;
+                    var dir2 = (secondarySpherePoint1.transform.position - transform.parent.position) / 5;
+                    var dir3 = (secondarySpherePoint2.transform.position - transform.parent.position) / 5;
+                    sphere1.GetComponent<MagicSphere>().GoInDirection(dir1, isMonsterWeapon, magicSphereVelocity, damage, maxDistance, isCrit, criticalMultiplayer);
+                    sphere2.GetComponent<MagicSphere>().GoInDirection(dir2, isMonsterWeapon, magicSphereVelocity, damage, maxDistance, isCrit, criticalMultiplayer);
+                    sphere3.GetComponent<MagicSphere>().GoInDirection(dir3, isMonsterWeapon, magicSphereVelocity, damage, maxDistance, isCrit, criticalMultiplayer);
                 }
-                sphere.GetComponent<MagicSphere>().GoInDirection(dir, isMonsterWeapon, magicSphereVelocity, damage, maxDistance);
             }
         }
         if (isStaffGoingUp)

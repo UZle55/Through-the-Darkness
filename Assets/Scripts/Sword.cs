@@ -160,7 +160,17 @@ public class Sword : Weapon
                     }
                     if (hit.collider.tag.Equals("Monster"))
                     {
-                        enemy.GetComponent<Monster>().GetDamage(damage);
+                        var isCrit = GetRandomInt(1, 100) <= criticalChance;
+                        var avgDamage = Mathf.RoundToInt(damage);
+                        var nextDamage = avgDamage + GetRandomInt(-Mathf.RoundToInt(avgDamage * 0.2f), Mathf.RoundToInt(avgDamage * 0.2f));
+                        if (isCrit)
+                        {
+                            enemy.GetComponent<Monster>().GetDamage(Mathf.RoundToInt(nextDamage * criticalMultiplayer), avgDamage, isCrit);
+                        }
+                        else
+                        {
+                            enemy.GetComponent<Monster>().GetDamage(nextDamage, avgDamage, isCrit);
+                        }
                         if(knockBackForce != 0)
                         {
                             enemy.GetComponent<Monster>().KnockBack(knockBackForce);

@@ -6,6 +6,14 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
+    public enum Class
+    {
+        Archer,
+        Mage,
+        Summoner,
+        Melee
+    }
+    public Class playerClass;
     public KeyCode moveUp;
     public KeyCode moveDown;
     public KeyCode moveLeft;
@@ -16,11 +24,14 @@ public class Player : MonoBehaviour
     public KeyCode Interact;
     public KeyCode useHPFlask;
     public KeyCode useManaFlask;
+    public KeyCode ability1Activate;
+    public KeyCode ability2Activate;
     public int nextMoveSpeed;
     private int moveSpeed;
     private float diagonalMovingCoef;
     private Vector2 moveVector = new Vector2(0, 0);
     private bool isDead = false;
+    private bool isHoldingAttackButton = false;
 
     public GameObject info;
     public GameObject rot;
@@ -41,6 +52,7 @@ public class Player : MonoBehaviour
     public GameObject coinsCountText;
     private int coinsCount;
     public GameObject miniMap;
+    public GameObject lootStats;
 
     public float hp;
     public GameObject healthBar;
@@ -68,6 +80,9 @@ public class Player : MonoBehaviour
     private GameObject chestToOpen;
     private GameObject portal;
     private bool canClickOnPortal = false;
+
+    private bool isAbility1Active = false;
+    private bool isAbility2Active = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -101,6 +116,19 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (isHoldingAttackButton)
+        {
+            if (currMana >= weaponInHands.GetComponent<Weapon>().attackManaCost)
+            {
+                var isAttacked = weaponInHands.GetComponent<Weapon>().Attack();
+                if (isAttacked)
+                {
+                    ChangeMana(-weaponInHands.GetComponent<Weapon>().attackManaCost);
+                }
+            }
+        }
+
+
         if (!isDead)
         {
 
@@ -151,6 +179,8 @@ public class Player : MonoBehaviour
 
             if (Input.GetKeyDown(attack))
             {
+                if(weaponInHands.GetComponent<Weapon>().type != Weapon.Type.Bow)
+                    isHoldingAttackButton = true;
                 if(currMana >= weaponInHands.GetComponent<Weapon>().attackManaCost)
                 {
                     var isAttacked = weaponInHands.GetComponent<Weapon>().Attack();
@@ -164,7 +194,7 @@ public class Player : MonoBehaviour
 
             if (Input.GetKeyUp(attack))
             {
-                var a = 0;
+                isHoldingAttackButton = false;
             }
 
             if (Input.GetKeyDown(switchWeapon))
@@ -206,6 +236,16 @@ public class Player : MonoBehaviour
                 var isUsed = flaskMana.GetComponent<Flask>().Use();
             }
 
+            if (Input.GetKeyDown(ability1Activate))
+            {
+                GetComponent<AbilitiesManager>().Ability1Click();
+            }
+
+            if (Input.GetKeyDown(ability2Activate))
+            {
+                GetComponent<AbilitiesManager>().Ability2Click();
+            }
+
             //PassiveHPRegeneration();
 
             PassiveManaRegeneration();
@@ -216,6 +256,26 @@ public class Player : MonoBehaviour
             //UpdateStatsText();
         }
         
+    }
+
+    public void Ability1Activate()
+    {
+        isAbility1Active = true;
+    }
+
+    public void Ability2Activate()
+    {
+        isAbility2Active = true;
+    }
+
+    public void Ability1Disactivate()
+    {
+        isAbility1Active = false;
+    }
+
+    public void Ability2Disactivate()
+    {
+        isAbility2Active = false;
     }
 
     private void UpdateCoinsCount()
@@ -313,20 +373,24 @@ public class Player : MonoBehaviour
                     {
                         flaskToPickUp = null;
                         canClickOnPortal = false;
-                        ShowTextAbovePlayer(weaponToPickUp.name, -1);
+                        ShowTextAbovePlayer(weaponToPickUp.GetComponent<Weapon>().weaponName, -1);
+                        lootStats.SetActive(true);
+                        lootStats.transform.GetChild(0).gameObject.GetComponent<Text>().text = weaponToPickUp.GetComponent<Weapon>().GetStatsText();
                     }
                     else if (distanceToFlask < distanceToPortal && distanceToFlask < distanceToWeapon)
                     {
                         weaponToPickUp = null;
                         canClickOnPortal = false;
-                        ShowTextAbovePlayer(flaskToPickUp.name, -1);
+                        ShowTextAbovePlayer(flaskToPickUp.GetComponent<Flask>().flaskName, -1);
+                        lootStats.SetActive(true);
+                        lootStats.transform.GetChild(0).gameObject.GetComponent<Text>().text = flaskToPickUp.GetComponent<Flask>().GetStatsText();
                     }
                     else if(distanceToPortal <= distanceToWeapon && distanceToPortal <= distanceToFlask)
                     {
                         weaponToPickUp = null;
                         flaskToPickUp = null;
                         canClickOnPortal = true;
-                        ShowTextAbovePlayer(portal.name, -1);
+                        ShowTextAbovePlayer("Портал", -1);
                     }
                 }
                 else if (weaponToPickUp != null && flaskToPickUp == null)
@@ -334,13 +398,15 @@ public class Player : MonoBehaviour
                     if (distanceToWeapon < distanceToPortal)
                     {
                         canClickOnPortal = false;
-                        ShowTextAbovePlayer(weaponToPickUp.name, -1);
+                        ShowTextAbovePlayer(weaponToPickUp.GetComponent<Weapon>().weaponName, -1);
+                        lootStats.SetActive(true);
+                        lootStats.transform.GetChild(0).gameObject.GetComponent<Text>().text = weaponToPickUp.GetComponent<Weapon>().GetStatsText();
                     }
                     else
                     {
                         weaponToPickUp = null;
                         canClickOnPortal = true;
-                        ShowTextAbovePlayer(portal.name, -1);
+                        ShowTextAbovePlayer("Портал", -1);
                     }
                 }
                 else if (weaponToPickUp == null && flaskToPickUp != null)
@@ -348,19 +414,21 @@ public class Player : MonoBehaviour
                     if (distanceToFlask < distanceToPortal)
                     {
                         canClickOnPortal = false;
-                        ShowTextAbovePlayer(flaskToPickUp.name, -1);
+                        ShowTextAbovePlayer(flaskToPickUp.GetComponent<Flask>().flaskName, -1);
+                        lootStats.SetActive(true);
+                        lootStats.transform.GetChild(0).gameObject.GetComponent<Text>().text = flaskToPickUp.GetComponent<Flask>().GetStatsText();
                     }
                     else
                     {
                         flaskToPickUp = null;
                         canClickOnPortal = true;
-                        ShowTextAbovePlayer(portal.name, -1);
+                        ShowTextAbovePlayer("Портал", -1);
                     }
                 }
                 else
                 {
                     canClickOnPortal = true;
-                    ShowTextAbovePlayer(portal.name, -1);
+                    ShowTextAbovePlayer("Портал", -1);
                 }
             }
             else
@@ -370,21 +438,29 @@ public class Player : MonoBehaviour
                     if (distanceToWeapon < distanceToFlask)
                     {
                         flaskToPickUp = null;
-                        ShowTextAbovePlayer(weaponToPickUp.name, -1);
+                        ShowTextAbovePlayer(weaponToPickUp.GetComponent<Weapon>().weaponName, -1);
+                        lootStats.SetActive(true);
+                        lootStats.transform.GetChild(0).gameObject.GetComponent<Text>().text = weaponToPickUp.GetComponent<Weapon>().GetStatsText();
                     }
                     else if (distanceToWeapon >= distanceToFlask)
                     {
                         weaponToPickUp = null;
-                        ShowTextAbovePlayer(flaskToPickUp.name, -1);
+                        ShowTextAbovePlayer(flaskToPickUp.GetComponent<Flask>().flaskName, -1);
+                        lootStats.SetActive(true);
+                        lootStats.transform.GetChild(0).gameObject.GetComponent<Text>().text = flaskToPickUp.GetComponent<Flask>().GetStatsText();
                     }
                 }
                 else if (weaponToPickUp != null && flaskToPickUp == null)
                 {
-                    ShowTextAbovePlayer(weaponToPickUp.name, -1);
+                    ShowTextAbovePlayer(weaponToPickUp.GetComponent<Weapon>().weaponName, -1);
+                    lootStats.SetActive(true);
+                    lootStats.transform.GetChild(0).gameObject.GetComponent<Text>().text = weaponToPickUp.GetComponent<Weapon>().GetStatsText();
                 }
                 else if (weaponToPickUp == null && flaskToPickUp != null)
                 {
-                    ShowTextAbovePlayer(flaskToPickUp.name, -1);
+                    ShowTextAbovePlayer(flaskToPickUp.GetComponent<Flask>().flaskName, -1);
+                    lootStats.SetActive(true);
+                    lootStats.transform.GetChild(0).gameObject.GetComponent<Text>().text = flaskToPickUp.GetComponent<Flask>().GetStatsText();
                 }
                 else
                 {
@@ -401,11 +477,19 @@ public class Player : MonoBehaviour
         {
             Invoke("StopShowingTextAbovePlayer", seconds);
         }
+        if (lootStats.activeSelf && (text.Equals("Портал") || text.Equals("Сундук")))
+        {
+            lootStats.SetActive(false);
+        }
     }
 
     private void StopShowingTextAbovePlayer()
     {
         abovePlayerText.GetComponent<Text>().text = "";
+        if (lootStats.activeSelf)
+        {
+            lootStats.SetActive(false);
+        }
     }
 
     private void PickUpWeapon(GameObject weapon)
@@ -607,17 +691,20 @@ public class Player : MonoBehaviour
 
     public void GetDamage(float damage)
     {
-        currHP -= damage;
-        if (currHP <= 0)
+        if (!isAbility1Active)
         {
-            Die();
+            currHP -= damage;
+            if (currHP <= 0)
+            {
+                Die();
+            }
+            else
+            {
+                var value = currHP / maxHP;
+                healthBar.GetComponent<Slider>().value = value;
+            }
+            UpdateStatsText();
         }
-        else
-        {
-            var value = currHP / maxHP;
-            healthBar.GetComponent<Slider>().value = value;
-        }
-        UpdateStatsText();
     }
 
     public void HealHealth(float health)
@@ -702,14 +789,29 @@ public class Player : MonoBehaviour
 
     private void SetVelocity()
     {
-        if(moveVector.x != 0 && moveVector.y != 0)
+        if (!isAbility2Active)
         {
-            GetComponent<Rigidbody2D>().velocity = new Vector2(moveVector.x * diagonalMovingCoef, moveVector.y * diagonalMovingCoef);
+            if (moveVector.x != 0 && moveVector.y != 0)
+            {
+                GetComponent<Rigidbody2D>().velocity = new Vector2(moveVector.x * diagonalMovingCoef, moveVector.y * diagonalMovingCoef);
+            }
+            else
+            {
+                GetComponent<Rigidbody2D>().velocity = moveVector;
+            }
         }
         else
         {
-            GetComponent<Rigidbody2D>().velocity = moveVector;
+            if (moveVector.x != 0 && moveVector.y != 0)
+            {
+                GetComponent<Rigidbody2D>().velocity = new Vector2(moveVector.x * diagonalMovingCoef * 1.5f, moveVector.y * diagonalMovingCoef);
+            }
+            else
+            {
+                GetComponent<Rigidbody2D>().velocity = moveVector * 1.5f;
+            }
         }
+        
     }
 
     private float GetNextMaxExp()

@@ -70,6 +70,8 @@ public class Monster : MonoBehaviour
     private float timeGoingStraight = 0;
     private bool[] isGoingAroundArray = new bool[3];
     private float[] goingAroundTimers = new float[3];
+
+    public GameObject damageMarker;
     // Start is called before the first frame update
     void Start()
     {
@@ -216,9 +218,10 @@ public class Monster : MonoBehaviour
 
     }
 
-    public void GetDamage(float damage)
+    public void GetDamage(int damage, int avgDamage, bool isCrit)
     {
         currHP -= damage;
+        damageMarker.GetComponent<DamageMarker>().ShowDamage(damage, avgDamage, isCrit);
         if(currHP <= 0)
         {
             Die();

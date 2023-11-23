@@ -15,6 +15,7 @@ TagManager:
   - Flask
   - FlaskOnGround
   - FlaskInHands
+  - FloorTile
   layers:
   - Default
   - TransparentFX

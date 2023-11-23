@@ -107,14 +107,14 @@ public class Chest : MonoBehaviour
 
     public void Prepare()
     {
-        lootPointsToMove[0] = new Vector3(transform.position.x, transform.position.y + 1, transform.position.z);
-        lootPointsToMove[1] = new Vector3(transform.position.x + 1, transform.position.y, transform.position.z);
-        lootPointsToMove[2] = new Vector3(transform.position.x - 1, transform.position.y, transform.position.z);
-        lootPointsToMove[3] = new Vector3(transform.position.x, transform.position.y - 1, transform.position.z);
+        lootPointsToMove[0] = new Vector3(transform.position.x, transform.position.y + 1, -0.5f);
+        lootPointsToMove[1] = new Vector3(transform.position.x + 1, transform.position.y, -0.5f);
+        lootPointsToMove[2] = new Vector3(transform.position.x - 1, transform.position.y, -0.5f);
+        lootPointsToMove[3] = new Vector3(transform.position.x, transform.position.y - 1, -0.5f);
         for (var i = 0; i < Loot.Length; i++)
         {
             Loot[i] = Instantiate(Loot[i], null);
-            Loot[i].transform.position = new Vector3(1000, 1000, -1);
+            Loot[i].transform.position = new Vector3(1000, 1000, -0.5f);
         }
 
         gameObject.SetActive(false);
