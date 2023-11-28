@@ -26,8 +26,9 @@ public class Player : MonoBehaviour
     public KeyCode useManaFlask;
     public KeyCode ability1Activate;
     public KeyCode ability2Activate;
-    public int nextMoveSpeed;
-    private int moveSpeed;
+    public float nextMoveSpeed;
+    public float defaultMoveSpeed; 
+    private float moveSpeed;
     private float diagonalMovingCoef;
     private Vector2 moveVector = new Vector2(0, 0);
     private bool isDead = false;
@@ -83,6 +84,9 @@ public class Player : MonoBehaviour
 
     private bool isAbility1Active = false;
     private bool isAbility2Active = false;
+    public GameObject playerSprite;
+    public GameObject abilityShield;
+    public GameObject trailPoints;
     // Start is called before the first frame update
     void Start()
     {
@@ -140,40 +144,38 @@ public class Player : MonoBehaviour
 
             if (Input.GetKeyDown(moveUp))
             {
-                moveVector += new Vector2(0, moveSpeed);
+                moveVector += new Vector2(0, 1);
             }
             if (Input.GetKeyDown(moveDown))
             {
-                moveVector += new Vector2(0, -moveSpeed);
+                moveVector += new Vector2(0, -1);
             }
             if (Input.GetKeyDown(moveLeft))
             {
-                moveVector += new Vector2(-moveSpeed, 0);
+                moveVector += new Vector2(-1, 0);
             }
             if (Input.GetKeyDown(moveRight))
             {
-                moveVector += new Vector2(moveSpeed, 0);
+                moveVector += new Vector2(1, 0);
             }
 
 
             if (Input.GetKeyUp(moveUp))
             {
-                moveVector += new Vector2(0, -moveSpeed);
+                moveVector += new Vector2(0, -1);
             }
             if (Input.GetKeyUp(moveDown))
             {
-                moveVector += new Vector2(0, moveSpeed);
+                moveVector += new Vector2(0, 1);
             }
             if (Input.GetKeyUp(moveLeft))
             {
-                moveVector += new Vector2(moveSpeed, 0);
+                moveVector += new Vector2(1, 0);
             }
             if (Input.GetKeyUp(moveRight))
             {
-                moveVector += new Vector2(-moveSpeed, 0);
+                moveVector += new Vector2(-1, 0);
             }
-
-            SetVelocity();
 
             RotateRot();
 
@@ -253,29 +255,46 @@ public class Player : MonoBehaviour
             CheckWeaponsAndFlasksOnGround();
 
             UpdateCoinsCount();
+            FlipSprite();
             //UpdateStatsText();
         }
         
     }
 
+    private void FixedUpdate()
+    {
+        SetVelocity();
+    }
+
+    private void FlipSprite()
+    {
+        playerSprite.GetComponent<SpriteRenderer>().flipX = 180 - rot.transform.localEulerAngles.z >= 0;
+    }
+
     public void Ability1Activate()
     {
         isAbility1Active = true;
+        abilityShield.SetActive(isAbility1Active);
     }
 
     public void Ability2Activate()
     {
         isAbility2Active = true;
+        nextMoveSpeed = defaultMoveSpeed * 1.5f;
+        trailPoints.SetActive(isAbility2Active);
     }
 
     public void Ability1Disactivate()
     {
         isAbility1Active = false;
+        abilityShield.SetActive(isAbility1Active);
     }
 
     public void Ability2Disactivate()
     {
         isAbility2Active = false;
+        nextMoveSpeed = defaultMoveSpeed;
+        trailPoints.SetActive(isAbility2Active);
     }
 
     private void UpdateCoinsCount()
@@ -676,7 +695,7 @@ public class Player : MonoBehaviour
     {
         healthBarText.GetComponent<Text>().text = (int)currHP + "/" + (int)maxHP;
         manaBarText.GetComponent<Text>().text = (int)currMana + "/" + (int)maxMana;
-        expBarText.GetComponent<Text>().text = "lvl " + lvl;
+        expBarText.GetComponent<Text>().text = "lvl " + lvl + " (" + currExp + "/" + maxExp + ")";
     }
 
     private void PassiveHPRegeneration()
@@ -789,29 +808,15 @@ public class Player : MonoBehaviour
 
     private void SetVelocity()
     {
-        if (!isAbility2Active)
+        if (moveVector.x != 0 && moveVector.y != 0)
         {
-            if (moveVector.x != 0 && moveVector.y != 0)
-            {
-                GetComponent<Rigidbody2D>().velocity = new Vector2(moveVector.x * diagonalMovingCoef, moveVector.y * diagonalMovingCoef);
-            }
-            else
-            {
-                GetComponent<Rigidbody2D>().velocity = moveVector;
-            }
+            GetComponent<Rigidbody2D>().AddForce(new Vector3(moveVector.x * diagonalMovingCoef * moveSpeed, moveVector.y * diagonalMovingCoef * moveSpeed));
         }
         else
         {
-            if (moveVector.x != 0 && moveVector.y != 0)
-            {
-                GetComponent<Rigidbody2D>().velocity = new Vector2(moveVector.x * diagonalMovingCoef * 1.5f, moveVector.y * diagonalMovingCoef);
-            }
-            else
-            {
-                GetComponent<Rigidbody2D>().velocity = moveVector * 1.5f;
-            }
+            GetComponent<Rigidbody2D>().AddForce(moveVector * moveSpeed);
         }
-        
+
     }
 
     private float GetNextMaxExp()

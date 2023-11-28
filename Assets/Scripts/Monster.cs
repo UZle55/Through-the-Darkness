@@ -86,6 +86,11 @@ public class Monster : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
+    }
+
+    private void FixedUpdate()
+    {
         if (isActive && !isKnockingBack)
         {
             attackTime += Time.deltaTime;
@@ -94,7 +99,7 @@ public class Monster : MonoBehaviour
             if (isGoingAround)
             {
                 timeGoingAround += Time.deltaTime;
-                if (timeGoingAround > 0.5f )
+                if (timeGoingAround > 0.5f)
                 {
                     isGoingAround = false;
                     chosenDirection = null;
@@ -102,7 +107,7 @@ public class Monster : MonoBehaviour
                     var isAnyFalse = false;
                     for (var i = 0; i < isGoingAroundArray.Length; i++)
                     {
-                        
+
                         if (!isGoingAroundArray[i])
                         {
                             isAnyFalse = true;
@@ -134,7 +139,7 @@ public class Monster : MonoBehaviour
                 {
                     count++;
                     goingAroundTimers[i] += Time.deltaTime;
-                    if(goingAroundTimers[i] > 5f)
+                    if (goingAroundTimers[i] > 5f)
                     {
                         goingAroundTimers[i] = 0;
                         isGoingAroundArray[i] = false;
@@ -205,7 +210,7 @@ public class Monster : MonoBehaviour
         else if (isKnockingBack && isActive)
         {
             durationKnockingBack += Time.deltaTime;
-            if(durationKnockingBack > 0.25f)
+            if (durationKnockingBack > 0.25f)
             {
                 durationKnockingBack = 0;
                 isKnockingBack = false;
@@ -282,7 +287,7 @@ public class Monster : MonoBehaviour
     {
         var c = Mathf.Sqrt(dir.x * dir.x + dir.y * dir.y);
         var coef = moveSpeed / c;
-        GetComponent<Rigidbody2D>().velocity = dir * coef;
+        GetComponent<Rigidbody2D>().AddForce(dir * coef);
         //info.GetComponent<Text>().text = "c: " + c + "  coef: " + coef + "  vel: " + GetComponent<Rigidbody2D>().velocity.ToString();
 
     }
