@@ -518,7 +518,7 @@ public class Player : MonoBehaviour
             weapon.transform.parent = gameObject.transform;
             weapon1 = weapon;
             weaponInHands = weapon1;
-            weaponInHands.transform.localPosition = new Vector3(0, 0, -1);
+            weaponInHands.transform.localPosition = new Vector3(0, 0, -2);
             weaponInHands.tag = "WeaponInHands";
             weaponInHands.SetActive(true);
             if(weapon2 != null)
