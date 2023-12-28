@@ -1,0 +1,83 @@
+
+Тело.png
+size: 638,256
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Layer 1
+  rotate: true
+  xy: 4, 63
+  size: 189, 407
+  orig: 189, 407
+  offset: 0, 0
+  index: -1
+Голова
+  rotate: false
+  xy: 415, 18
+  size: 219, 234
+  orig: 219, 234
+  offset: 0, 0
+  index: -1
+Левая голень
+  rotate: true
+  xy: 182, 12
+  size: 47, 75
+  orig: 47, 75
+  offset: 0, 0
+  index: -1
+Правая голень
+  rotate: true
+  xy: 182, 12
+  size: 47, 75
+  orig: 47, 75
+  offset: 0, 0
+  index: -1
+Левая стопа
+  rotate: false
+  xy: 293, 33
+  size: 43, 26
+  orig: 43, 26
+  offset: 0, 0
+  index: -1
+Правая стопа
+  rotate: false
+  xy: 293, 33
+  size: 43, 26
+  orig: 43, 26
+  offset: 0, 0
+  index: -1
+Левое бедро
+  rotate: true
+  xy: 88, 18
+  size: 41, 90
+  orig: 41, 90
+  offset: 0, 0
+  index: -1
+Правая бедро
+  rotate: true
+  xy: 88, 18
+  size: 41, 90
+  orig: 41, 90
+  offset: 0, 0
+  index: -1
+Правая кисть
+  rotate: true
+  xy: 340, 34
+  size: 25, 36
+  orig: 25, 36
+  offset: 0, 0
+  index: -1
+Правое плечо
+  rotate: true
+  xy: 4, 4
+  size: 55, 80
+  orig: 55, 80
+  offset: 0, 0
+  index: -1
+Правый локоть
+  rotate: false
+  xy: 261, 14
+  size: 28, 45
+  orig: 28, 45
+  offset: 0, 0
+  index: -1

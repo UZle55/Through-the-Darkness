@@ -1,0 +1,48 @@
+
+skeletmag.png
+size: 650,279
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Layer 1
+  rotate: true
+  xy: 4, 9
+  size: 266, 345
+  orig: 266, 345
+  offset: 0, 0
+  index: -1
+Layer 3
+  rotate: true
+  xy: 353, 120
+  size: 155, 210
+  orig: 155, 210
+  offset: 0, 0
+  index: -1
+Layer 4
+  rotate: false
+  xy: 469, 4
+  size: 73, 112
+  orig: 73, 112
+  offset: 0, 0
+  index: -1
+Layer 5
+  rotate: false
+  xy: 567, 32
+  size: 73, 113
+  orig: 73, 113
+  offset: 0, 0
+  index: -1
+Layer 6
+  rotate: false
+  xy: 567, 149
+  size: 79, 126
+  orig: 79, 126
+  offset: 0, 0
+  index: -1
+Layer 7
+  rotate: true
+  xy: 353, 12
+  size: 104, 112
+  orig: 104, 112
+  offset: 0, 0
+  index: -1

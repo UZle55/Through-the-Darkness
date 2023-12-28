@@ -1,0 +1,48 @@
+
+photo_2023-12-19_00-34-14.png
+size: 834,273
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Layer 1
+  rotate: true
+  xy: 4, 4
+  size: 265, 431
+  orig: 265, 431
+  offset: 0, 0
+  index: -1
+Layer 2
+  rotate: false
+  xy: 439, 7
+  size: 207, 262
+  orig: 207, 262
+  offset: 0, 0
+  index: -1
+Layer 3
+  rotate: false
+  xy: 650, 30
+  size: 78, 125
+  orig: 78, 125
+  offset: 0, 0
+  index: -1
+Layer 4
+  rotate: false
+  xy: 732, 40
+  size: 71, 112
+  orig: 71, 112
+  offset: 0, 0
+  index: -1
+Layer 5
+  rotate: false
+  xy: 758, 156
+  size: 72, 113
+  orig: 72, 113
+  offset: 0, 0
+  index: -1
+Layer 6
+  rotate: false
+  xy: 650, 159
+  size: 104, 110
+  orig: 104, 110
+  offset: 0, 0
+  index: -1
