@@ -1,3 +1,4 @@
+using InstantGamesBridge;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,6 +33,8 @@ public class LevelsGenerator : MonoBehaviour
 
     public void GenerateNextFloor()
     {
+        Bridge.advertisement.ShowInterstitial();
+
         var pastFloorParent = currentFloorParent;
         currentFloorParent = new GameObject();
         if (pastFloorParent != null)
