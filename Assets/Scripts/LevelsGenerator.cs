@@ -19,10 +19,11 @@ public class LevelsGenerator : MonoBehaviour
     public GameObject allMonsters;
     public GameObject miniMap;
     private GameObject[,] roomsMap;
+    public GameObject floorTilesVariants;
     // Start is called before the first frame update
     void Start()
     {
-        
+        SetRandomFloorSprite();
     }
 
     // Update is called once per frame
@@ -31,8 +32,19 @@ public class LevelsGenerator : MonoBehaviour
         
     }
 
+    private void SetRandomFloorSprite()
+    {
+        var allFloorTiles = GameObject.FindGameObjectsWithTag("FloorTile");
+        var rnd = GetRandomInt(0, 4);
+        foreach (var floorTile in allFloorTiles)
+        {
+            floorTile.GetComponent<SpriteRenderer>().sprite = floorTilesVariants.transform.GetChild(rnd).gameObject.GetComponent<SpriteRenderer>().sprite;
+        }
+    }
+
     public void GenerateNextFloor()
     {
+        SetRandomFloorSprite();
         Bridge.advertisement.ShowInterstitial();
 
         var pastFloorParent = currentFloorParent;

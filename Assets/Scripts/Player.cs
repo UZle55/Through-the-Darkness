@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Spine;
+using Spine.Unity;
 
 public class Player : MonoBehaviour
 {
@@ -120,6 +122,7 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Animate();
         if (isHoldingAttackButton)
         {
             if (currMana >= weaponInHands.GetComponent<Weapon>().attackManaCost)
@@ -268,7 +271,15 @@ public class Player : MonoBehaviour
 
     private void FlipSprite()
     {
-        playerSprite.GetComponent<SpriteRenderer>().flipX = 180 - rot.transform.localEulerAngles.z >= 0;
+        //playerSprite.GetComponent<SpriteRenderer>().flipX = 180 - rot.transform.localEulerAngles.z >= 0;
+        if (180 - rot.transform.localEulerAngles.z >= 0)
+        {
+            playerSprite.transform.localScale = new Vector3(-0.33f, 0.33f, 0.33f);
+        }
+        else
+        {
+            playerSprite.transform.localScale = new Vector3(0.33f, 0.33f, 0.33f);
+        }
     }
 
     public void Ability1Activate()
@@ -282,6 +293,7 @@ public class Player : MonoBehaviour
         isAbility2Active = true;
         nextMoveSpeed = defaultMoveSpeed * 1.5f;
         trailPoints.SetActive(isAbility2Active);
+        playerSprite.GetComponent<SkeletonAnimation>().timeScale = 7.5f;
     }
 
     public void Ability1Disactivate()
@@ -295,6 +307,8 @@ public class Player : MonoBehaviour
         isAbility2Active = false;
         nextMoveSpeed = defaultMoveSpeed;
         trailPoints.SetActive(isAbility2Active);
+
+        playerSprite.GetComponent<SkeletonAnimation>().timeScale = 5;
     }
 
     private void UpdateCoinsCount()
@@ -817,6 +831,22 @@ public class Player : MonoBehaviour
             GetComponent<Rigidbody2D>().AddForce(moveVector * moveSpeed);
         }
 
+    }
+
+    private void Animate()
+    {
+        var a = playerSprite.GetComponent<SkeletonAnimation>();
+        if ((Mathf.Abs(GetComponent<Rigidbody2D>().velocity.x) > 0.1f || Mathf.Abs(GetComponent<Rigidbody2D>().velocity.y) > 0.1f)
+            && (playerSprite.GetComponent<SkeletonAnimation>().AnimationName == null || !playerSprite.GetComponent<SkeletonAnimation>().AnimationName.Equals("run")))
+        {
+            playerSprite.GetComponent<SkeletonAnimation>().AnimationName = "run";
+        }
+        if (Mathf.Abs(GetComponent<Rigidbody2D>().velocity.x) < 0.1f && Mathf.Abs(GetComponent<Rigidbody2D>().velocity.y) < 0.1f 
+            && playerSprite.GetComponent<SkeletonAnimation>().AnimationName != null)
+        {
+            playerSprite.GetComponent<SkeletonAnimation>().AnimationName = null;
+            playerSprite.GetComponent<SkeletonAnimation>().ClearState();
+        }
     }
 
     private float GetNextMaxExp()
