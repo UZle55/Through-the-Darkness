@@ -22,11 +22,13 @@ public class RoomController : MonoBehaviour
     public GameObject chest;
     public RoomType roomType = RoomType.Basic;
     private bool isFirstTimeInRoom = true;
+    public Color closedColor;
+    public Color openedColor;
     
     // Start is called before the first frame update
     void Start()
     {
-
+        OpenDoors();
     }
 
     // Update is called once per frame
@@ -71,7 +73,7 @@ public class RoomController : MonoBehaviour
         foreach(var door in Doors)
         {
             door.GetComponent<BoxCollider2D>().isTrigger = false;
-            door.GetComponent<SpriteRenderer>().color = Color.red;
+            door.GetComponent<SpriteRenderer>().color = closedColor;
         }
 
         foreach (var destroyer in ProjectileDestroyers)
@@ -93,7 +95,7 @@ public class RoomController : MonoBehaviour
         foreach (var door in Doors)
         {
             door.GetComponent<BoxCollider2D>().isTrigger = true;
-            door.GetComponent<SpriteRenderer>().color = Color.white;
+            door.GetComponent<SpriteRenderer>().color = openedColor;
         }
     }
 
