@@ -1,0 +1,48 @@
+
+voinskelet.png
+size: 782,311
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Layer 1
+  rotate: true
+  xy: 4, 4
+  size: 303, 469
+  orig: 303, 469
+  offset: 0, 0
+  index: -1
+Layer 2
+  rotate: false
+  xy: 477, 36
+  size: 114, 271
+  orig: 114, 271
+  offset: 0, 0
+  index: -1
+Layer 3
+  rotate: false
+  xy: 690, 27
+  size: 88, 109
+  orig: 88, 109
+  offset: 0, 0
+  index: -1
+Layer 4
+  rotate: false
+  xy: 595, 4
+  size: 91, 132
+  orig: 91, 132
+  offset: 0, 0
+  index: -1
+Layer 5
+  rotate: false
+  xy: 701, 153
+  size: 74, 154
+  orig: 74, 154
+  offset: 0, 0
+  index: -1
+Layer 6
+  rotate: true
+  xy: 595, 140
+  size: 167, 102
+  orig: 167, 102
+  offset: 0, 0
+  index: -1

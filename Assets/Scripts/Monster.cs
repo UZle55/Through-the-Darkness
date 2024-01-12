@@ -276,6 +276,7 @@ public class Monster : MonoBehaviour
         }
         Rot.transform.localEulerAngles = new Vector3(0, 0, angle);
         Weapon.GetComponent<Weapon>().SetAngle(angle);
+        GetComponent<SpriteRenderer>().flipX = angle > 0;
     }
 
     private void StopMoving()
@@ -289,7 +290,7 @@ public class Monster : MonoBehaviour
         var coef = moveSpeed / c;
         GetComponent<Rigidbody2D>().AddForce(dir * coef);
         //info.GetComponent<Text>().text = "c: " + c + "  coef: " + coef + "  vel: " + GetComponent<Rigidbody2D>().velocity.ToString();
-
+        
     }
 
     private void CheckPlayer()
